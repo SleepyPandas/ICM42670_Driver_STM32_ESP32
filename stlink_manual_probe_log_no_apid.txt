@@ -1,0 +1,50 @@
+[0.000] initConfigParams():  Configuration flags start
+[0.000] initConfigParams():   semihost-console-port          61236
+[0.000] initConfigParams():   semihosting                    "disabled"
+[0.000] initConfigParams():   external-init                  false
+[0.000] initConfigParams():  +pend-halt-timeout              15
+[0.000] initConfigParams():   halt                           false
+[0.000] initConfigParams():   config-file                    ""
+[0.000] initConfigParams():   persistent                     false
+[0.000] initConfigParams():  +log-file                       "stlink_manual_probe_log_no_apid.txt"
+[0.002] initConfigParams():  +log-level                      31
+[0.002] initConfigParams():  +port-number                    61234
+[0.002] initConfigParams():   verbose                        false
+[0.002] initConfigParams():   refresh-delay                  15
+[0.002] initConfigParams():   target-sel                     ""
+[0.002] initConfigParams():   pcm-pm-force                   false
+[0.002] initConfigParams():   incremental                    false
+[0.002] initConfigParams():   verify                         false
+[0.002] initConfigParams():  +swd                            true
+[0.002] initConfigParams():   swo-port                       61234
+[0.002] initConfigParams():   cpu-clock                      8000000
+[0.002] initConfigParams():   swo-clock-div                  128
+[0.002] initConfigParams():  +initialize-reset               true
+[0.002] initConfigParams():   debuggers                      false
+[0.002] initConfigParams():   serial-number                  ""
+[0.002] initConfigParams():   apid                           0
+[0.002] initConfigParams():   attach                         false
+[0.002] initConfigParams():   shared                         false
+[0.002] initConfigParams():   erase-all                      false
+[0.002] initConfigParams():   memory-map                     ""
+[0.002] initConfigParams():   ext-memory-loaders             false
+[0.002] initConfigParams():   extload_init                   (null)
+[0.002] initConfigParams():   extload                        (null)
+[0.002] initConfigParams():  +stm32cubeprogrammer-path       "C:\Users\AnthonyPC\AppData\Local\stm32cube\bundles\programmer\2.22.0+st.1\bin"
+[0.002] initConfigParams():   temp-path                      ""
+[0.002] initConfigParams():   preserve-temps                 false
+[0.002] initConfigParams():  +frequency                      140
+[0.002] initConfigParams():   licenses                       false
+[0.002] initConfigParams():   ignore-rest                    false
+[0.002] initConfigParams():   version                        false
+[0.002] initConfigParams():   help                           false
+[0.002] initConfigParams():  Configuration flags end
+[0.010] init():  STMicroelectronics ST-LINK GDB server. Version 7.13.0
+Copyright (c) 2026, STMicroelectronics. All rights reserved.
+[0.015] openDevice():  COM frequency = 50 kHz
+[0.015] openDevice():  Target connection mode: Under reset
+[0.042] openDevice():  Target connection failed
+[0.042] openDevice():  Target unknown error 32
+[0.043] initServerContext():  
+Error in initializing ST-LINK device.
+Reason: [0.044] initServerContext():  Unknown. Please check power and cabling to target.

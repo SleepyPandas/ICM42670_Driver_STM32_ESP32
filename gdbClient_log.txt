@@ -1,0 +1,580 @@
+2026-4-8, 02:49:04.607 UTC
+[02:49:04.607 UTC] From client: initialize({"clientID":"vscode","clientName":"Visual Studio Code","adapterID":"stlinkgdbtarget","pathFormat":"path","linesStartAt1":true,"columnsStartAt1":true,"supportsVariableType":true,"supportsVariablePaging":true,"supportsRunInTerminalRequest":true,"locale":"en","supportsProgressReporting":true,"supportsInvalidatedEvent":true,"supportsMemoryReferences":true,"supportsArgsCanBeInterpretedByShell":true,"supportsMemoryEvent":true,"supportsStartDebuggingRequest":true,"supportsANSIStyling":true})
+[02:49:04.607 UTC] To client: {"seq":0,"type":"response","request_seq":1,"command":"initialize","success":true,"body":{"supportsEvaluateForHovers":true,"supportsConfigurationDoneRequest":true,"supportsSetVariable":true,"supportsConditionalBreakpoints":true,"supportsHitConditionalBreakpoints":true,"supportsLogPoints":true,"supportsFunctionBreakpoints":true,"supportsDisassembleRequest":true,"supportsReadMemoryRequest":true,"supportsWriteMemoryRequest":true,"supportsSteppingGranularity":true}}
+[02:49:04.607 UTC] From client: launch({"type":"stlinkgdbtarget","request":"launch","name":"STM32Cube: Launch ST-Link (Recovery)","origin":"snippet","cwd":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver","preBuild":"${command:st-stm32-ide-debug-launch.build}","runEntry":"main","program":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/build/Debug/ICM42670_Driver.elf","imagesAndSymbols":[{"imageFileName":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/build/Debug/ICM42670_Driver.elf"}],"deviceName":"STM32H503RBT6","deviceCore":"Cortex-M33","deviceTrustzone":"Non-secure","serverInterface":"SWD","serverInterfaceFrequency":"1000","serverReset":"Connect under reset","serverPendingHaltTimeout":"10","verbose":true,"serverLogFile":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/stlinkgdbserver_log.txt","logFile":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/gdbClient_log.txt","__configurationTarget":6,"__sessionId":"93bd5715-62d1-4dc9-a504-f506608cfc4d"})
+[02:49:04.607 UTC] From Debug Session: start Launch Sequence
+[02:49:05.060 UTC] From Debug Session: Step pre-build
+[02:49:05.060 UTC] From Debug Session: Step validate debug configuration
+[02:49:05.259 UTC] From Debug Session: Step ST-Link device check
+[02:49:05.259 UTC] From Debug Session: Step start STLink GDB Server
+[02:49:05.517 UTC] GDB Server command line executed: cube stlink-gdbserver -cp C:\Users\AnthonyPC\AppData\Local\stm32cube\bundles\programmer\2.22.0+st.1\bin -k -d --frequency 1000 -m 1 --pend-halt-timeout 10 -p 61234 -f C:\Users\AnthonyPC\Documents\GitHub\ICM42670_Driver/stlinkgdbserver_log.txt -l 31
+[02:49:05.521 UTC] From Debug Session: Step check genuine ST device
+[02:49:05.521 UTC] From Debug Session: Step start RTOS Proxie(s)
+[02:49:05.521 UTC] From Debug Session: Step start gdb client debug
+[02:49:05.543 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"\r\n\r\nSTMicroelectronics ST-LINK GDB server. Version 7.13.0\r\nCopyright (c) 2026, STMicroelectronics. All rights reserved.\r\n\r\nStarting server with the following options:\r\n        Persistent Mode            : Disabled\r\n        LogFile Name               : C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/stlinkgdbserver_log.txt\r\n        Logging Level              : 31\r\n        Listen Port Number         : 61234\r\n        Status Refresh Delay       : 15s\r\n        Verbose Mode               : Disabled\r\n        SWD Debug                  : Enabled\r\n        InitWhile                  : Enabled\r\n\r\n"}}
+[02:49:05.547 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"COM frequency = 1000 kHz\r\nTarget connection mode: Under reset\r\n"}}
+[02:49:05.569 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Reading ROM table for AP 1 @0xe00fefd0\r\n"}}
+[02:49:05.571 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Hardware watchpoint supported by the target \r\n"}}
+[02:49:05.574 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"ST-LINK Firmware version : V3J16M9\r\nDevice ID: 0x474\r\n"}}
+[02:49:05.574 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"PC: 0x80035e4\r\n"}}
+[02:49:05.575 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"ST-LINK device status: HALT_MODE\r\n"}}
+[02:49:05.575 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"ST-LINK detects target voltage = 3.29 V\r\n"}}
+[02:49:05.575 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"TrustZone: Inactive\r\n"}}
+[02:49:05.575 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"ST-LINK device status: HALT_MODE\r\n"}}
+[02:49:05.575 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"ST-LINK device initialization OK\r\n"}}
+[02:49:05.576 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Stm32Device, pollAndNotify running...\r\n"}}
+[02:49:05.576 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"SwvSrv state change: 0 -> 1\r\n"}}
+[02:49:05.576 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Waiting for debugger connection...\r\nWaiting for connection on port 61234...\r\n"}}
+[02:49:05.576 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Waiting for connection on port 61235...\r\n"}}
+[02:49:05.596 UTC] GDB notify async: thread-group-added,id="i1"
+[02:49:05.597 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"GNU gdb (GNU Tools for STM32 14.3.rel1.20251027-0700) 15.2.90.20241229-git\n"}}
+[02:49:05.597 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Copyright (C) 2024 Free Software Foundation, Inc.\n"}}
+[02:49:05.597 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law."}}
+[02:49:05.597 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"\nType \"show copying\" and \"show warranty\" for details.\n"}}
+[02:49:05.597 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"This GDB was configured as \"--host=x86_64-w64-mingw32 --target=arm-none-eabi\".\n"}}
+[02:49:05.597 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Type \"show configuration\" for configuration details.\n"}}
+[02:49:05.597 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"For bug reporting instructions, please see:\n"}}
+[02:49:05.597 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"<https://www.gnu.org/software/gdb/bugs/>.\n"}}
+[02:49:05.597 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Find the GDB manual and other documentation resources online at:\n    <"}}
+[02:49:05.597 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"http://www.gnu.org/software/gdb/documentation/>.\n\n"}}
+[02:49:05.597 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"For help, type \"help\".\n"}}
+[02:49:05.597 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Type \"apropos word\" to search for commands related to \"word\".\n"}}
+[02:49:05.597 UTC] GDB command: 0 -gdb-set non-stop off
+[02:49:05.615 UTC] GDB result: 0 done
+[02:49:05.615 UTC] GDB command: 1 -gdb-set mi-async on
+[02:49:05.630 UTC] GDB result: 1 done
+[02:49:05.630 UTC] From Debug Session: Step load program
+[02:49:05.630 UTC] GDB command: 2 -file-exec-and-symbols "C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/build/Debug/ICM42670_Driver.elf"
+[02:49:05.647 UTC] GDB result: 2 done
+[02:49:05.647 UTC] From Debug Session: Step load symbols (STLink adapter)
+[02:49:05.647 UTC] GDB command: 3 -enable-pretty-printing
+[02:49:05.661 UTC] GDB result: 3 done
+[02:49:05.661 UTC] From Debug Session: Step load symbols C:\Users\AnthonyPC\Documents\GitHub\ICM42670_Driver/build/Debug/ICM42670_Driver.elf (STLink adapter)
+[02:49:05.661 UTC] GDB command: 4 add-symbol-file "C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/build/Debug/ICM42670_Driver.elf" 
+[02:49:05.677 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"log","output":"add-symbol-file \"C:\\\\Users\\\\AnthonyPC\\\\Documents\\\\GitHub\\\\ICM42670_Driver/build/Debug/ICM42670_Driver.elf\" \n"}}
+[02:49:05.677 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"add symbol table from file \"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/build/Debug/ICM42670_Driver.elf\"\n"}}
+[02:49:05.677 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"(y or n) [answered Y; input not from terminal]\n"}}
+[02:49:05.677 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Reading symbols from C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/build/Debug/ICM42670_Driver.elf...\n"}}
+[02:49:05.677 UTC] GDB result: 4 done
+[02:49:05.678 UTC] From Debug Session: Step connect to target
+[02:49:05.678 UTC] GDB command: 5 -target-select remote localhost:61234
+[02:49:07.768 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Accepted connection on port 61234...\r\nDebugger connected\r\n"}}
+[02:49:07.768 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Waiting for debugger connection...\r\n"}}
+[02:49:07.768 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Waiting for connection on port 61234...\r\n"}}
+[02:49:07.769 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session thread running\r\nGdbSessionManager, session started: 1\r\n"}}
+[02:49:07.787 UTC] GDB notify async: thread-group-started,id="i1",pid="42000"
+[02:49:07.788 UTC] GDB notify async: thread-created,id="1",group-id="i1"
+[02:49:07.810 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Reset_Handler () at C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver\\startup_stm32h503xx.s:62\n"}}
+[02:49:07.810 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"62\t  ldr   sp, =_estack    /* set stack pointer */\n"}}
+[02:49:07.810 UTC] GDB exec async: stopped,frame={addr="0x080035e4",func="Reset_Handler",args=[],file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver\\startup_stm32h503xx.s",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\startup_stm32h503xx.s",line="62",arch="armv8-m.main"},thread-id="1",stopped-threads="all",core="1"
+[02:49:07.811 UTC] GDB result: 5 connected
+[02:49:07.811 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"console","output":"connected to remote target localhost:61234"}}
+[02:49:07.811 UTC] From Debug Session: Step apply reset strategy
+[02:49:07.811 UTC] From Debug Session: Step execute init commands
+[02:49:07.811 UTC] GDB command: 6 tbreak main
+[02:49:07.811 UTC] From Debug Session: Step load images
+[02:49:07.811 UTC] GDB command: 7 load "C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/build/Debug/ICM42670_Driver.elf" 
+[02:49:07.831 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"log","output":"tbreak main\n"}}
+[02:49:07.847 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Temporary breakpoint 1 at 0x8003156: file C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c, line 82.\n"}}
+[02:49:07.847 UTC] GDB notify async: breakpoint-created,bkpt={number="1",type="breakpoint",disp="del",enabled="y",addr="0x08003156",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="82",thread-groups=["i1"],times="0",original-location="main"}
+[02:49:07.847 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Note: automatically using hardware breakpoints for read-only addresses.\n"}}
+[02:49:07.847 UTC] GDB result: 6 done
+[02:49:07.847 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"log","output":"load \"C:\\\\Users\\\\AnthonyPC\\\\Documents\\\\GitHub\\\\ICM42670_Driver/build/Debug/ICM42670_Driver.elf\" \n"}}
+[02:49:07.847 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Loading section .isr_vector, size 0x258 lma 0x8000000\n"}}
+[02:49:07.847 UTC] GDB status async: download,{section=".isr_vector",section-size="600",total-size="1041886"}
+[02:49:07.848 UTC] GDB status async: download,{section=".isr_vector",section-sent="600",section-size="600",total-sent="600",total-size="1041886"}
+[02:49:07.848 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Loading section .text, size 0x3450 lma 0x8000258\n"}}
+[02:49:07.849 UTC] GDB status async: download,{section=".text",section-size="13392",total-size="1041886"}
+[02:49:07.849 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Loading section .rodata, size 0x10 lma 0x80036a8\n"}}
+[02:49:07.849 UTC] GDB status async: download,{section=".rodata",section-size="16",total-size="1041886"}
+[02:49:07.849 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Loading section .init_array, size 0x4 lma 0x80036b8\n"}}
+[02:49:07.849 UTC] GDB status async: download,{section=".init_array",section-size="4",total-size="1041886"}
+[02:49:07.849 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Loading section .fini_array, size 0x4 lma 0x80036bc\n"}}
+[02:49:07.849 UTC] GDB status async: download,{section=".fini_array",section-size="4",total-size="1041886"}
+[02:49:07.849 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Loading section .data, size 0xc lma 0x80036c0\n"}}
+[02:49:07.849 UTC] GDB status async: download,{section=".data",section-size="12",total-size="1041886"}
+[02:49:07.852 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Stm32Device, closeDevice() entry\r\nGDB session, device event: 6\r\n"}}
+[02:49:07.877 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Stm32Device, pollAndNotify stopped\r\n"}}
+[02:49:07.880 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Stm32Device, closeDevice() exit\r\n"}}
+[02:49:07.880 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":" ------ Switching to STM32CubeProgrammer ----- \r\n"}}
+[02:49:07.899 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"      -------------------------------------------------------------------\r\n                       STM32CubeProgrammer v2.22.0                  \r\n"}}
+[02:49:07.899 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"      -------------------------------------------------------------------\r\n\r\n"}}
+[02:49:07.902 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"\r\n\r\n"}}
+[02:49:07.902 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Log output file:   C:\\Users\\ANTHON~1\\AppData\\Local\\Temp\\STM32CubeProgrammer_a28624.log\r\n"}}
+[02:49:07.924 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"ST-LINK SN  : 001D002B3133510636303739\r\nST-LINK FW  : V3J16M9\r\n"}}
+[02:49:07.924 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Board       : NUCLEO-H503RB\r\n"}}
+[02:49:07.924 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Voltage     : 3.28V\r\n"}}
+[02:49:07.937 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"SWD freq    : 1000 KHz\r\n"}}
+[02:49:07.937 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Connect mode: Under Reset\r\nReset mode  : Hardware reset\r\n"}}
+[02:49:07.941 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Device ID   : 0x474\r\n"}}
+[02:49:07.946 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Revision ID : Rev Y\r\n"}}
+[02:49:08.071 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Device name : STM32H50x\r\n"}}
+[02:49:08.071 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"NVM size  : 128 KBytes\r\n"}}
+[02:49:08.071 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Device type : MCU\r\nDevice CPU  : Cortex-M33\r\n"}}
+[02:49:08.073 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"BL Version  : 0xE2\r\n"}}
+[02:49:08.079 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"SFSP Version: v1.4.0\r\n"}}
+[02:49:08.083 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Debug in Low Power mode enabled\r\n\r\n"}}
+[02:49:08.087 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"\r\n\r\n"}}
+[02:49:08.087 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Opening and parsing file: ST-LINK_GDB_server_a28624.srec\r\n"}}
+[02:49:08.087 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"\r\n\r\nMemory Programming ...\r\n  File          : ST-LINK_GDB_server_a28624.srec\r\n"}}
+[02:49:08.087 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"  Size          : 13.70 KB \r\n  Address       : 0x08000000\r\n\r\n\r\n"}}
+[02:49:08.087 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Erasing memory corresponding to segment 0:\r\n"}}
+[02:49:08.111 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Erasing internal memory sectors [0 1]\r\n"}}
+[02:49:08.143 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Download in Progress:\r\n"}}
+[02:49:08.327 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"\r\n\r\nFile download complete\r\n"}}
+[02:49:08.327 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Time elapsed during download operation: 00:00:00.239\r\n"}}
+[02:49:08.340 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":" ------ Switching context ----- \r\n"}}
+[02:49:08.342 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"COM frequency = 1000 kHz\r\nTarget connection mode: Under reset\r\n"}}
+[02:49:08.365 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Reading ROM table for AP 1 @0xe00fefd0\r\n"}}
+[02:49:08.367 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Hardware watchpoint supported by the target \r\n"}}
+[02:49:08.370 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"ST-LINK Firmware version : V3J16M9\r\nDevice ID: 0x474\r\n"}}
+[02:49:08.370 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"PC: 0x80035e4\r\n"}}
+[02:49:08.371 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"ST-LINK detects target voltage = 3.29 V\r\n"}}
+[02:49:08.371 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"TrustZone: Inactive\r\n"}}
+[02:49:08.371 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"ST-LINK device status: HALT_MODE\r\n"}}
+[02:49:08.371 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 7\r\n"}}
+[02:49:08.371 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Start address 0x080035e4, load size 14028\n"}}
+[02:49:08.371 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Stm32Device, pollAndNotify running...\r\n"}}
+[02:49:08.373 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Transfer rate: 26 KB/sec, 2338 bytes/write.\n"}}
+[02:49:08.373 UTC] GDB result: 7 done
+[02:49:08.373 UTC] From Debug Session: Step register post programming
+[02:49:08.373 UTC] GDB command: 8 set *(int *)0xE000ED14=*(int *)0xE000ED14|0x10
+[02:49:08.394 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"log","output":"set *(int *)0xE000ED14=*(int *)0xE000ED14|0x10\n"}}
+[02:49:08.396 UTC] GDB notify async: memory-changed,thread-group="i1",addr="0xe000ed14",len="0x4"
+[02:49:08.415 UTC] GDB result: 8 done
+[02:49:08.415 UTC] GDB command: 9 set *(int *)0xE000EDFC=*(int *)0xE000EDFC|0xff0
+[02:49:08.425 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"log","output":"set *(int *)0xE000EDFC=*(int *)0xE000EDFC|0xff0\n"}}
+[02:49:08.426 UTC] GDB notify async: memory-changed,thread-group="i1",addr="0xe000edfc",len="0x4"
+[02:49:08.445 UTC] GDB result: 9 done
+[02:49:08.445 UTC] From Debug Session: Step pre run commands
+[02:49:08.445 UTC] From Debug Session: Step initialized request
+[02:49:08.445 UTC] To client: {"seq":0,"type":"event","event":"initialized"}
+[02:49:08.445 UTC] To client: {"seq":0,"type":"response","request_seq":2,"command":"launch","success":true}
+[02:49:08.446 UTC] From client: adapter/getDebugConfResolved(undefined)
+[02:49:08.446 UTC] To client: {"seq":0,"type":"response","request_seq":3,"command":"adapter/getDebugConfResolved","success":true,"body":{"type":"stlinkgdbtarget","request":"launch","name":"STM32Cube: Launch ST-Link (Recovery)","origin":"snippet","cwd":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver","preBuild":"${command:st-stm32-ide-debug-launch.build}","runEntry":"main","program":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/build/Debug/ICM42670_Driver.elf","imagesAndSymbols":[{"imageFileName":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/build/Debug/ICM42670_Driver.elf"}],"deviceName":"STM32H503RBT6","deviceCore":"Cortex-M33","deviceTrustzone":"Non-secure","serverInterface":"SWD","serverInterfaceFrequency":"1000","serverReset":"Connect under reset","serverPendingHaltTimeout":"10","verbose":true,"serverLogFile":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/stlinkgdbserver_log.txt","logFile":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/gdbClient_log.txt","__configurationTarget":6,"__sessionId":"93bd5715-62d1-4dc9-a504-f506608cfc4d","__pid":26428,"__initialConfig":{"type":"stlinkgdbtarget","request":"launch","name":"STM32Cube: Launch ST-Link (Recovery)","origin":"snippet","cwd":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver","preBuild":"${command:st-stm32-ide-debug-launch.build}","runEntry":"main","program":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/build/Debug/ICM42670_Driver.elf","imagesAndSymbols":[{"imageFileName":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/build/Debug/ICM42670_Driver.elf"}],"deviceName":"STM32H503RBT6","deviceCore":"Cortex-M33","deviceTrustzone":"Non-secure","serverInterface":"SWD","serverInterfaceFrequency":"1000","serverReset":"Connect under reset","serverPendingHaltTimeout":"10","verbose":true,"serverLogFile":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/stlinkgdbserver_log.txt","logFile":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver/gdbClient_log.txt","__configurationTarget":6,"__sessionId":"93bd5715-62d1-4dc9-a504-f506608cfc4d","__pid":26428},"svdPath":"C:\\Users\\AnthonyPC\\AppData\\Local\\stm32cube\\packs\\STMicroelectronics\\stm32h5xx_dfp\\1.2.0\\SVD\\STM32H503.svd","serverApID":"1","serverShared":false,"serverHaltAllCores":false,"serverHost":"localhost","serverPort":"61234","openGdbConsole":false,"faultDivByZero":true,"faultUnalignedAccess":false,"faultHaltOnException":true}}
+[02:49:08.446 UTC] From client: setBreakpoints({"source":{"name":"main.c","path":"c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c"},"lines":[113,121,123,126],"breakpoints":[{"line":113},{"line":121},{"line":123},{"line":126}],"sourceModified":false})
+[02:49:08.447 UTC] GDB command: 10 -break-list
+[02:49:08.447 UTC] From client: setFunctionBreakpoints({"breakpoints":[]})
+[02:49:08.447 UTC] GDB command: 11 -break-list
+[02:49:08.456 UTC] GDB result: 10 done,BreakpointTable={nr_rows="1",nr_cols="6",hdr=[{width="7",alignment="-1",col_name="number",colhdr="Num"},{width="14",alignment="-1",col_name="type",colhdr="Type"},{width="4",alignment="-1",col_name="disp",colhdr="Disp"},{width="3",alignment="-1",col_name="enabled",colhdr="Enb"},{width="10",alignment="-1",col_name="addr",colhdr="Address"},{width="40",alignment="2",col_name="what",colhdr="What"}],body=[bkpt={number="1",type="breakpoint",disp="del",enabled="y",addr="0x08003156",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="82",thread-groups=["i1"],times="0",original-location="main"}]}
+[02:49:08.457 UTC] GDB command: 12 -break-insert --source "c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c" --line 113
+[02:49:08.457 UTC] GDB result: 11 done,BreakpointTable={nr_rows="1",nr_cols="6",hdr=[{width="7",alignment="-1",col_name="number",colhdr="Num"},{width="14",alignment="-1",col_name="type",colhdr="Type"},{width="4",alignment="-1",col_name="disp",colhdr="Disp"},{width="3",alignment="-1",col_name="enabled",colhdr="Enb"},{width="10",alignment="-1",col_name="addr",colhdr="Address"},{width="40",alignment="2",col_name="what",colhdr="What"}],body=[bkpt={number="1",type="breakpoint",disp="del",enabled="y",addr="0x08003156",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="82",thread-groups=["i1"],times="0",original-location="main"}]}
+[02:49:08.457 UTC] To client: {"seq":0,"type":"response","request_seq":5,"command":"setFunctionBreakpoints","success":true,"body":{"breakpoints":[]}}
+[02:49:08.473 UTC] GDB result: 12 done,bkpt={number="2",type="breakpoint",disp="keep",enabled="y",addr="0x0800316e",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="113",thread-groups=["i1"],times="0",original-location="-source c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c -line 113"}
+[02:49:08.473 UTC] GDB command: 13 -break-insert --source "c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c" --line 121
+[02:49:08.489 UTC] GDB result: 13 done,bkpt={number="3",type="breakpoint",disp="keep",enabled="y",addr="0x0800318a",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="121",thread-groups=["i1"],times="0",original-location="-source c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c -line 121"}
+[02:49:08.489 UTC] GDB command: 14 -break-insert --source "c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c" --line 123
+[02:49:08.505 UTC] GDB result: 14 done,bkpt={number="4",type="breakpoint",disp="keep",enabled="y",addr="0x08003192",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="123",thread-groups=["i1"],times="0",original-location="-source c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c -line 123"}
+[02:49:08.505 UTC] GDB command: 15 -break-insert --source "c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c" --line 126
+[02:49:08.520 UTC] GDB result: 15 done,bkpt={number="5",type="breakpoint",disp="keep",enabled="y",addr="0x08003196",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="126",thread-groups=["i1"],times="0",original-location="-source c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c -line 126"}
+[02:49:08.520 UTC] To client: {"seq":0,"type":"response","request_seq":4,"command":"setBreakpoints","success":true,"body":{"breakpoints":[{"id":2,"line":113,"verified":true},{"id":3,"line":121,"verified":true},{"id":4,"line":123,"verified":true},{"id":5,"line":126,"verified":true}]}}
+[02:49:08.614 UTC] From client: configurationDone(undefined)
+[02:49:08.614 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"console","output":"\nIn the Debug Console view you can interact directly with GDB.\nTo display the value of an expression, type that expression which can reference\nvariables that are in scope. For example type '2 + 3' or the name of a variable.\nArbitrary commands can be sent to GDB by prefixing the input with a '>',\nfor example type '>show version' or '>help'.\n\n"}}
+[02:49:08.614 UTC] GDB command: 16 -exec-continue
+[02:49:08.629 UTC] GDB result: 16 running
+[02:49:08.629 UTC] GDB exec async: running,thread-id="all"
+[02:49:08.629 UTC] To client: {"seq":0,"type":"event","event":"continued","body":{"threadId":1,"allThreadsContinued":true}}
+[02:49:08.630 UTC] To client: {"seq":0,"type":"response","request_seq":6,"command":"configurationDone","success":true}
+[02:49:08.645 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 4\r\n"}}
+[02:49:08.646 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 2\r\n"}}
+[02:49:08.646 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"NVIC_DFSR_REG = 0x0000000B \r\n"}}
+[02:49:08.647 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Non-secure state\r\n"}}
+[02:49:08.648 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Stm32Device, getHaltReason, code: 4\r\nGDB session, device event: 1\r\n"}}
+[02:49:08.675 UTC] From client: threads(undefined)
+[02:49:08.675 UTC] To client: {"seq":0,"type":"response","request_seq":7,"command":"threads","success":true,"body":{"threads":[{"id":1,"name":"1","running":true}]}}
+[02:49:08.680 UTC] GDB notify async: breakpoint-modified,bkpt={number="1",type="breakpoint",disp="del",enabled="y",addr="0x08003156",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="82",thread-groups=["i1"],times="1",original-location="main"}
+[02:49:08.683 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"\n"}}
+[02:49:08.683 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Temporary breakpoint 1, main () at C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c:82\n"}}
+[02:49:08.683 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"82\t  HAL_Init();\n"}}
+[02:49:08.683 UTC] GDB exec async: stopped,reason="breakpoint-hit",disp="del",bkptno="1",frame={addr="0x08003156",func="main",args=[],file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="82",arch="armv8-m.main"},thread-id="1",stopped-threads="all",core="1"
+[02:49:08.683 UTC] To client: {"seq":0,"type":"event","event":"stopped","body":{"reason":"breakpoint","allThreadsStopped":true,"threadId":1}}
+[02:49:08.683 UTC] GDB notify async: breakpoint-deleted,id="1"
+[02:49:08.684 UTC] From client: readMemory({"memoryReference":"0xE000ED2C","count":4})
+[02:49:08.684 UTC] GDB command: 17 -data-read-memory-bytes -o 0 "0xE000ED2C" 4
+[02:49:08.685 UTC] From client: readMemory({"memoryReference":"0xE000ED29","count":1})
+[02:49:08.685 UTC] GDB command: 18 -data-read-memory-bytes -o 0 "0xE000ED29" 1
+[02:49:08.685 UTC] From client: readMemory({"memoryReference":"0xE000ED28","count":1})
+[02:49:08.685 UTC] GDB command: 19 -data-read-memory-bytes -o 0 "0xE000ED28" 1
+[02:49:08.685 UTC] From client: readMemory({"memoryReference":"0xE000ED2A","count":2})
+[02:49:08.685 UTC] GDB command: 20 -data-read-memory-bytes -o 0 "0xE000ED2A" 2
+[02:49:08.685 UTC] From client: readMemory({"memoryReference":"0xE000EDE4","count":1})
+[02:49:08.685 UTC] GDB command: 21 -data-read-memory-bytes -o 0 "0xE000EDE4" 1
+[02:49:08.686 UTC] From client: threads(undefined)
+[02:49:08.686 UTC] GDB command: 22 -thread-info
+[02:49:08.695 UTC] GDB result: 17 done,memory=[{begin="0xe000ed2c",offset="0x00000000",end="0xe000ed30",contents="00000000"}]
+[02:49:08.695 UTC] To client: {"seq":0,"type":"response","request_seq":8,"command":"readMemory","success":true,"body":{"data":"AAAAAA==","address":"0xe000ed2c"}}
+[02:49:08.695 UTC] GDB result: 18 done,memory=[{begin="0xe000ed29",offset="0x00000000",end="0xe000ed2a",contents="00"}]
+[02:49:08.695 UTC] To client: {"seq":0,"type":"response","request_seq":9,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ed29"}}
+[02:49:08.696 UTC] GDB result: 19 done,memory=[{begin="0xe000ed28",offset="0x00000000",end="0xe000ed29",contents="00"}]
+[02:49:08.696 UTC] To client: {"seq":0,"type":"response","request_seq":10,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ed28"}}
+[02:49:08.696 UTC] GDB result: 20 done,memory=[{begin="0xe000ed2a",offset="0x00000000",end="0xe000ed2c",contents="0000"}]
+[02:49:08.696 UTC] To client: {"seq":0,"type":"response","request_seq":11,"command":"readMemory","success":true,"body":{"data":"AAA=","address":"0xe000ed2a"}}
+[02:49:08.697 UTC] GDB result: 21 done,memory=[{begin="0xe000ede4",offset="0x00000000",end="0xe000ede5",contents="00"}]
+[02:49:08.697 UTC] To client: {"seq":0,"type":"response","request_seq":12,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ede4"}}
+[02:49:08.697 UTC] GDB result: 22 done,threads=[{id="1",target-id="Thread 1",name="main",frame={level="0",addr="0x08003156",func="main",args=[],file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="82",arch="armv8-m.main"},state="stopped",core="1"}],current-thread-id="1"
+[02:49:08.697 UTC] To client: {"seq":0,"type":"response","request_seq":13,"command":"threads","success":true,"body":{"threads":[{"id":1,"name":"main","running":false}]}}
+[02:49:08.698 UTC] From client: stackTrace({"threadId":1,"startFrame":0,"levels":20})
+[02:49:08.698 UTC] GDB command: 23 -stack-info-depth --thread 1 100
+[02:49:08.710 UTC] GDB result: 23 done,depth="1"
+[02:49:08.710 UTC] GDB command: 24 -stack-list-frames --thread 1 0 0
+[02:49:08.726 UTC] GDB result: 24 done,stack=[frame={level="0",addr="0x08003156",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="82",arch="armv8-m.main"}]
+[02:49:08.726 UTC] To client: {"seq":0,"type":"response","request_seq":14,"command":"stackTrace","success":true,"body":{"stackFrames":[{"id":1000,"source":{"name":"main.c","path":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c","sourceReference":0},"line":82,"column":0,"name":"main","instructionPointerReference":"0x08003156"}],"totalFrames":1}}
+[02:49:08.727 UTC] From client: stackTrace({"threadId":1,"startFrame":0,"levels":20})
+[02:49:08.727 UTC] GDB command: 25 -stack-info-depth --thread 1 100
+[02:49:08.742 UTC] GDB result: 25 done,depth="1"
+[02:49:08.742 UTC] GDB command: 26 -stack-list-frames --thread 1 0 0
+[02:49:08.757 UTC] GDB result: 26 done,stack=[frame={level="0",addr="0x08003156",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="82",arch="armv8-m.main"}]
+[02:49:08.758 UTC] To client: {"seq":0,"type":"response","request_seq":15,"command":"stackTrace","success":true,"body":{"stackFrames":[{"id":1001,"source":{"name":"main.c","path":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c","sourceReference":0},"line":82,"column":0,"name":"main","instructionPointerReference":"0x08003156"}],"totalFrames":1}}
+[02:49:09.228 UTC] From client: scopes({"frameId":1000})
+[02:49:09.228 UTC] To client: {"seq":0,"type":"response","request_seq":16,"command":"scopes","success":true,"body":{"scopes":[{"name":"Local","variablesReference":1000,"expensive":false},{"name":"Registers","variablesReference":1001,"expensive":true}]}}
+[02:49:09.230 UTC] From client: variables({"variablesReference":1000})
+[02:49:09.230 UTC] GDB command: 27 -stack-info-depth 100
+[02:49:09.243 UTC] GDB result: 27 done,depth="1"
+[02:49:09.243 UTC] GDB command: 28 -stack-list-variables --thread 1 --frame 0 --simple-values
+[02:49:09.263 UTC] GDB result: 28 done,variables=[{name="icm_who_am_i",type="volatile uint8_t",value="0 '\\000'"},{name="icm_who_am_i_status",type="volatile HAL_StatusTypeDef",value="HAL_OK"}]
+[02:49:09.263 UTC] GDB command: 29 -var-create --thread 1 --frame 0 - * "icm_who_am_i"
+[02:49:09.275 UTC] GDB result: 29 done,name="var1",numchild="0",value="0 '\\000'",type="volatile uint8_t",thread-id="1",has_more="0"
+[02:49:09.275 UTC] GDB command: 30 -var-create --thread 1 --frame 0 - * "icm_who_am_i_status"
+[02:49:09.290 UTC] GDB result: 30 done,name="var2",numchild="0",value="HAL_OK",type="volatile HAL_StatusTypeDef",thread-id="1",has_more="0"
+[02:49:09.290 UTC] To client: {"seq":0,"type":"response","request_seq":17,"command":"variables","success":true,"body":{"variables":[{"name":"icm_who_am_i","evaluateName":"icm_who_am_i","value":"0 '\\000'","type":"volatile uint8_t","memoryReference":"&(icm_who_am_i)","variablesReference":0},{"name":"icm_who_am_i_status","evaluateName":"icm_who_am_i_status","value":"HAL_OK","type":"volatile HAL_StatusTypeDef","memoryReference":"&(icm_who_am_i_status)","variablesReference":0}]}}
+[02:49:14.140 UTC] From client: continue({"threadId":1})
+[02:49:14.140 UTC] GDB command: 31 -exec-continue --thread 1
+[02:49:14.155 UTC] GDB result: 31 running
+[02:49:14.155 UTC] GDB exec async: running,thread-id="all"
+[02:49:14.155 UTC] To client: {"seq":0,"type":"event","event":"continued","body":{"threadId":1,"allThreadsContinued":true}}
+[02:49:14.155 UTC] To client: {"seq":0,"type":"response","request_seq":18,"command":"continue","success":true,"body":{"allThreadsContinued":true}}
+[02:49:14.171 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 4\r\n"}}
+[02:49:14.171 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 2\r\n"}}
+[02:49:14.186 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"NVIC_DFSR_REG = 0x00000003 \r\n"}}
+[02:49:14.187 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Non-secure state\r\n"}}
+[02:49:14.188 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Stm32Device, getHaltReason, code: 4\r\nGDB session, device event: 1\r\n"}}
+[02:49:14.220 UTC] GDB notify async: breakpoint-modified,bkpt={number="2",type="breakpoint",disp="keep",enabled="y",addr="0x0800316e",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="113",thread-groups=["i1"],times="1",original-location="-source c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c -line 113"}
+[02:49:14.222 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"\n"}}
+[02:49:14.222 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Breakpoint 2, main () at C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c:113\n"}}
+[02:49:14.222 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"113\t    icm_who_am_i_status = HAL_I2C_Mem_Read(&hi2c2,\n"}}
+[02:49:14.222 UTC] GDB exec async: stopped,reason="breakpoint-hit",disp="keep",bkptno="2",frame={addr="0x0800316e",func="main",args=[],file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="113",arch="armv8-m.main"},thread-id="1",stopped-threads="all",core="1"
+[02:49:14.222 UTC] To client: {"seq":0,"type":"event","event":"stopped","body":{"reason":"breakpoint","allThreadsStopped":true,"threadId":1}}
+[02:49:14.302 UTC] From client: readMemory({"memoryReference":"0xE000ED2C","count":4})
+[02:49:14.302 UTC] GDB command: 32 -data-read-memory-bytes -o 0 "0xE000ED2C" 4
+[02:49:14.303 UTC] From client: readMemory({"memoryReference":"0xE000ED29","count":1})
+[02:49:14.303 UTC] GDB command: 33 -data-read-memory-bytes -o 0 "0xE000ED29" 1
+[02:49:14.303 UTC] From client: readMemory({"memoryReference":"0xE000ED28","count":1})
+[02:49:14.303 UTC] GDB command: 34 -data-read-memory-bytes -o 0 "0xE000ED28" 1
+[02:49:14.303 UTC] From client: readMemory({"memoryReference":"0xE000ED2A","count":2})
+[02:49:14.303 UTC] GDB command: 35 -data-read-memory-bytes -o 0 "0xE000ED2A" 2
+[02:49:14.303 UTC] From client: readMemory({"memoryReference":"0xE000EDE4","count":1})
+[02:49:14.303 UTC] GDB command: 36 -data-read-memory-bytes -o 0 "0xE000EDE4" 1
+[02:49:14.313 UTC] GDB result: 32 done,memory=[{begin="0xe000ed2c",offset="0x00000000",end="0xe000ed30",contents="00000000"}]
+[02:49:14.313 UTC] To client: {"seq":0,"type":"response","request_seq":19,"command":"readMemory","success":true,"body":{"data":"AAAAAA==","address":"0xe000ed2c"}}
+[02:49:14.314 UTC] GDB result: 33 done,memory=[{begin="0xe000ed29",offset="0x00000000",end="0xe000ed2a",contents="00"}]
+[02:49:14.314 UTC] To client: {"seq":0,"type":"response","request_seq":20,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ed29"}}
+[02:49:14.315 UTC] GDB result: 34 done,memory=[{begin="0xe000ed28",offset="0x00000000",end="0xe000ed29",contents="00"}]
+[02:49:14.315 UTC] To client: {"seq":0,"type":"response","request_seq":21,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ed28"}}
+[02:49:14.315 UTC] GDB result: 35 done,memory=[{begin="0xe000ed2a",offset="0x00000000",end="0xe000ed2c",contents="0000"}]
+[02:49:14.315 UTC] To client: {"seq":0,"type":"response","request_seq":22,"command":"readMemory","success":true,"body":{"data":"AAA=","address":"0xe000ed2a"}}
+[02:49:14.316 UTC] From client: threads(undefined)
+[02:49:14.316 UTC] GDB command: 37 -thread-info
+[02:49:14.316 UTC] GDB result: 36 done,memory=[{begin="0xe000ede4",offset="0x00000000",end="0xe000ede5",contents="00"}]
+[02:49:14.316 UTC] To client: {"seq":0,"type":"response","request_seq":23,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ede4"}}
+[02:49:14.316 UTC] GDB result: 37 done,threads=[{id="1",target-id="Thread 1",name="main",frame={level="0",addr="0x0800316e",func="main",args=[],file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="113",arch="armv8-m.main"},state="stopped",core="1"}],current-thread-id="1"
+[02:49:14.316 UTC] To client: {"seq":0,"type":"response","request_seq":24,"command":"threads","success":true,"body":{"threads":[{"id":1,"name":"main","running":false}]}}
+[02:49:14.412 UTC] From client: stackTrace({"threadId":1,"startFrame":0,"levels":20})
+[02:49:14.412 UTC] GDB command: 38 -stack-info-depth --thread 1 100
+[02:49:14.422 UTC] GDB result: 38 done,depth="1"
+[02:49:14.422 UTC] GDB command: 39 -stack-list-frames --thread 1 0 0
+[02:49:14.437 UTC] GDB result: 39 done,stack=[frame={level="0",addr="0x0800316e",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="113",arch="armv8-m.main"}]
+[02:49:14.437 UTC] To client: {"seq":0,"type":"response","request_seq":25,"command":"stackTrace","success":true,"body":{"stackFrames":[{"id":1000,"source":{"name":"main.c","path":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c","sourceReference":0},"line":113,"column":0,"name":"main","instructionPointerReference":"0x0800316e"}],"totalFrames":1}}
+[02:49:14.861 UTC] From client: scopes({"frameId":1000})
+[02:49:14.862 UTC] To client: {"seq":0,"type":"response","request_seq":26,"command":"scopes","success":true,"body":{"scopes":[{"name":"Local","variablesReference":1000,"expensive":false},{"name":"Registers","variablesReference":1001,"expensive":true}]}}
+[02:49:14.865 UTC] From client: variables({"variablesReference":1000})
+[02:49:14.865 UTC] GDB command: 40 -stack-info-depth 100
+[02:49:14.875 UTC] GDB result: 40 done,depth="1"
+[02:49:14.875 UTC] GDB command: 41 -var-update 1 var1
+[02:49:14.897 UTC] GDB result: 41 done,changelist=[]
+[02:49:14.897 UTC] GDB command: 42 -var-update 1 var2
+[02:49:14.922 UTC] GDB result: 42 done,changelist=[]
+[02:49:14.923 UTC] To client: {"seq":0,"type":"response","request_seq":27,"command":"variables","success":true,"body":{"variables":[{"name":"icm_who_am_i","evaluateName":"icm_who_am_i","value":"0 '\\000'","type":"volatile uint8_t","memoryReference":"&(icm_who_am_i)","variablesReference":0},{"name":"icm_who_am_i_status","evaluateName":"icm_who_am_i_status","value":"HAL_OK","type":"volatile HAL_StatusTypeDef","memoryReference":"&(icm_who_am_i_status)","variablesReference":0}]}}
+[02:49:19.093 UTC] From client: continue({"threadId":1})
+[02:49:19.093 UTC] GDB command: 43 -exec-continue --thread 1
+[02:49:19.105 UTC] GDB result: 43 running
+[02:49:19.105 UTC] GDB exec async: running,thread-id="all"
+[02:49:19.105 UTC] To client: {"seq":0,"type":"event","event":"continued","body":{"threadId":1,"allThreadsContinued":true}}
+[02:49:19.105 UTC] To client: {"seq":0,"type":"response","request_seq":28,"command":"continue","success":true,"body":{"allThreadsContinued":true}}
+[02:49:19.120 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 4\r\n"}}
+[02:49:19.122 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 2\r\n"}}
+[02:49:19.136 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"NVIC_DFSR_REG = 0x00000001 \r\n"}}
+[02:49:19.137 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Non-secure state\r\nStm32Device, getHaltReason, code: 5\r\nGDB session, device event: 1\r\n"}}
+[02:49:19.184 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 4\r\n"}}
+[02:49:19.185 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 2\r\n"}}
+[02:49:19.200 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"NVIC_DFSR_REG = 0x00000003 \r\n"}}
+[02:49:19.201 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Non-secure state\r\n"}}
+[02:49:19.202 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Stm32Device, getHaltReason, code: 4\r\n"}}
+[02:49:19.202 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 1\r\n"}}
+[02:49:19.234 UTC] GDB notify async: breakpoint-modified,bkpt={number="3",type="breakpoint",disp="keep",enabled="y",addr="0x0800318a",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="121",thread-groups=["i1"],times="1",original-location="-source c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c -line 121"}
+[02:49:19.236 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"\n"}}
+[02:49:19.236 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Breakpoint 3, main () at C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c:121\n"}}
+[02:49:19.236 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"121\t    if (icm_who_am_i_status != HAL_OK)\n"}}
+[02:49:19.236 UTC] GDB exec async: stopped,reason="breakpoint-hit",disp="keep",bkptno="3",frame={addr="0x0800318a",func="main",args=[],file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="121",arch="armv8-m.main"},thread-id="1",stopped-threads="all",core="1"
+[02:49:19.236 UTC] To client: {"seq":0,"type":"event","event":"stopped","body":{"reason":"breakpoint","allThreadsStopped":true,"threadId":1}}
+[02:49:19.258 UTC] From client: readMemory({"memoryReference":"0xE000ED2C","count":4})
+[02:49:19.258 UTC] GDB command: 44 -data-read-memory-bytes -o 0 "0xE000ED2C" 4
+[02:49:19.258 UTC] From client: readMemory({"memoryReference":"0xE000ED29","count":1})
+[02:49:19.258 UTC] GDB command: 45 -data-read-memory-bytes -o 0 "0xE000ED29" 1
+[02:49:19.258 UTC] From client: readMemory({"memoryReference":"0xE000ED28","count":1})
+[02:49:19.258 UTC] GDB command: 46 -data-read-memory-bytes -o 0 "0xE000ED28" 1
+[02:49:19.258 UTC] From client: readMemory({"memoryReference":"0xE000ED2A","count":2})
+[02:49:19.258 UTC] GDB command: 47 -data-read-memory-bytes -o 0 "0xE000ED2A" 2
+[02:49:19.258 UTC] From client: readMemory({"memoryReference":"0xE000EDE4","count":1})
+[02:49:19.258 UTC] GDB command: 48 -data-read-memory-bytes -o 0 "0xE000EDE4" 1
+[02:49:19.259 UTC] From client: threads(undefined)
+[02:49:19.259 UTC] GDB command: 49 -thread-info
+[02:49:19.264 UTC] GDB result: 44 done,memory=[{begin="0xe000ed2c",offset="0x00000000",end="0xe000ed30",contents="00000000"}]
+[02:49:19.264 UTC] To client: {"seq":0,"type":"response","request_seq":29,"command":"readMemory","success":true,"body":{"data":"AAAAAA==","address":"0xe000ed2c"}}
+[02:49:19.264 UTC] GDB result: 45 done,memory=[{begin="0xe000ed29",offset="0x00000000",end="0xe000ed2a",contents="00"}]
+[02:49:19.264 UTC] To client: {"seq":0,"type":"response","request_seq":30,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ed29"}}
+[02:49:19.264 UTC] GDB result: 46 done,memory=[{begin="0xe000ed28",offset="0x00000000",end="0xe000ed29",contents="00"}]
+[02:49:19.264 UTC] To client: {"seq":0,"type":"response","request_seq":31,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ed28"}}
+[02:49:19.265 UTC] GDB result: 47 done,memory=[{begin="0xe000ed2a",offset="0x00000000",end="0xe000ed2c",contents="0000"}]
+[02:49:19.265 UTC] To client: {"seq":0,"type":"response","request_seq":32,"command":"readMemory","success":true,"body":{"data":"AAA=","address":"0xe000ed2a"}}
+[02:49:19.265 UTC] GDB result: 48 done,memory=[{begin="0xe000ede4",offset="0x00000000",end="0xe000ede5",contents="00"}]
+[02:49:19.265 UTC] To client: {"seq":0,"type":"response","request_seq":33,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ede4"}}
+[02:49:19.266 UTC] GDB result: 49 done,threads=[{id="1",target-id="Thread 1",name="main",frame={level="0",addr="0x0800318a",func="main",args=[],file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="121",arch="armv8-m.main"},state="stopped",core="1"}],current-thread-id="1"
+[02:49:19.266 UTC] To client: {"seq":0,"type":"response","request_seq":34,"command":"threads","success":true,"body":{"threads":[{"id":1,"name":"main","running":false}]}}
+[02:49:19.356 UTC] From client: stackTrace({"threadId":1,"startFrame":0,"levels":20})
+[02:49:19.356 UTC] GDB command: 50 -stack-info-depth --thread 1 100
+[02:49:19.371 UTC] GDB result: 50 done,depth="1"
+[02:49:19.371 UTC] GDB command: 51 -stack-list-frames --thread 1 0 0
+[02:49:19.387 UTC] GDB result: 51 done,stack=[frame={level="0",addr="0x0800318a",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="121",arch="armv8-m.main"}]
+[02:49:19.387 UTC] To client: {"seq":0,"type":"response","request_seq":35,"command":"stackTrace","success":true,"body":{"stackFrames":[{"id":1000,"source":{"name":"main.c","path":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c","sourceReference":0},"line":121,"column":0,"name":"main","instructionPointerReference":"0x0800318a"}],"totalFrames":1}}
+[02:49:19.809 UTC] From client: scopes({"frameId":1000})
+[02:49:19.809 UTC] To client: {"seq":0,"type":"response","request_seq":36,"command":"scopes","success":true,"body":{"scopes":[{"name":"Local","variablesReference":1000,"expensive":false},{"name":"Registers","variablesReference":1001,"expensive":true}]}}
+[02:49:19.810 UTC] From client: variables({"variablesReference":1000})
+[02:49:19.810 UTC] GDB command: 52 -stack-info-depth 100
+[02:49:19.824 UTC] GDB result: 52 done,depth="1"
+[02:49:19.824 UTC] GDB command: 53 -var-update 1 var1
+[02:49:19.845 UTC] GDB result: 53 done,changelist=[]
+[02:49:19.845 UTC] GDB command: 54 -var-update 1 var2
+[02:49:19.856 UTC] GDB result: 54 done,changelist=[{name="var2",value="HAL_ERROR",in_scope="true",type_changed="false",has_more="0"}]
+[02:49:19.856 UTC] To client: {"seq":0,"type":"response","request_seq":37,"command":"variables","success":true,"body":{"variables":[{"name":"icm_who_am_i","evaluateName":"icm_who_am_i","value":"0 '\\000'","type":"volatile uint8_t","memoryReference":"&(icm_who_am_i)","variablesReference":0},{"name":"icm_who_am_i_status","evaluateName":"icm_who_am_i_status","value":"HAL_ERROR","type":"volatile HAL_StatusTypeDef","memoryReference":"&(icm_who_am_i_status)","variablesReference":0}]}}
+[02:49:26.124 UTC] From client: evaluate({"expression":"HAL_I2C_Mem_Read","frameId":1000,"context":"hover","line":113,"column":27,"source":{"name":"main.c","path":"c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c","sourceReference":0}})
+[02:49:26.124 UTC] GDB command: 55 -stack-info-depth 100
+[02:49:26.139 UTC] GDB result: 55 done,depth="1"
+[02:49:26.139 UTC] GDB command: 56 -var-create --thread 1 --frame 0 - * "HAL_I2C_Mem_Read"
+[02:49:26.149 UTC] GDB result: 56 done,name="var3",numchild="0",value="{HAL_StatusTypeDef (I2C_HandleTypeDef *, uint16_t, uint16_t, uint16_t, uint8_t *, uint16_t, uint32_t)} 0x80007d4 <HAL_I2C_Mem_Read>",type="HAL_StatusTypeDef (I2C_HandleTypeDef *, uint16_t, uint16_t, uint16_t, uint8_t *, uint16_t, uint32_t)",has_more="0"
+[02:49:26.149 UTC] To client: {"seq":0,"type":"response","request_seq":38,"command":"evaluate","success":true,"body":{"result":"{HAL_StatusTypeDef (I2C_HandleTypeDef *, uint16_t, uint16_t, uint16_t, uint8_t *, uint16_t, uint32_t)} 0x80007d4 <HAL_I2C_Mem_Read>","type":"HAL_StatusTypeDef (I2C_HandleTypeDef *, uint16_t, uint16_t, uint16_t, uint8_t *, uint16_t, uint32_t)","variablesReference":0}}
+[02:50:03.782 UTC] From client: variables({"variablesReference":1001})
+[02:50:03.783 UTC] GDB command: 57 -data-list-register-names --frame 0 --thread 1
+[02:50:03.791 UTC] GDB result: 57 done,register-names=["r0","r1","r2","r3","r4","r5","r6","r7","r8","r9","r10","r11","r12","sp","lr","pc","","","","","","","","","","xpsr","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","d0","d1","d2","d3","d4","d5","d6","d7","d8","d9","d10","d11","d12","d13","d14","d15","","","","","","","","","","","","","","","","","fpscr","msp","psp","primask","basepri","faultmask","control","s0","s1","s2","s3","s4","s5","s6","s7","s8","s9","s10","s11","s12","s13","s14","s15","s16","s17","s18","s19","s20","s21","s22","s23","s24","s25","s26","s27","s28","s29","s30","s31"]
+[02:50:03.791 UTC] GDB command: 58 -data-list-register-values --frame 0 --thread 1 x
+[02:50:03.807 UTC] GDB result: 58 done,register-values=[{number="0",value="0x1"},{number="1",value="0x100d0"},{number="2",value="0x0"},{number="3",value="0x1"},{number="4",value="0x0"},{number="5",value="0x0"},{number="6",value="0x0"},{number="7",value="0x20007ff0"},{number="8",value="0xffffffff"},{number="9",value="0xffffffff"},{number="10",value="0xffffffff"},{number="11",value="0xffffffff"},{number="12",value="0xffffffff"},{number="13",value="0x20007fe0"},{number="14",value="0x8000e3b"},{number="15",value="0x800318a"},{number="25",value="0x1000000"},{number="58",value="0x0"},{number="59",value="0x0"},{number="60",value="0x0"},{number="61",value="0x0"},{number="62",value="0x0"},{number="63",value="0x4600000000000000"},{number="64",value="0x4cf4247a45aab000"},{number="65",value="0x3d091e840000000"},{number="66",value="0x0"},{number="67",value="0x0"},{number="68",value="0x0"},{number="69",value="0x0"},{number="70",value="0x0"},{number="71",value="0x0"},{number="72",value="0x0"},{number="73",value="0x0"},{number="90",va
+[02:50:03.807 UTC] GDB -cont-: 58 lue="0x10"},{number="91",value="0x20007fe0"},{number="92",value="0x0"},{number="93",value="0x0"},{number="94",value="0x0"},{number="95",value="0x0"},{number="96",value="0x4"},{number="97",value="0x0"},{number="98",value="0x0"},{number="99",value="0x0"},{number="100",value="0x0"},{number="101",value="0x0"},{number="102",value="0x0"},{number="103",value="0x0"},{number="104",value="0x0"},{number="105",value="0x0"},{number="106",value="0x0"},{number="107",value="0x0"},{number="108",value="0x46000000"},{number="109",value="0x45aab000"},{number="110",value="0x4cf4247a"},{number="111",value="0x40000000"},{number="112",value="0x3d091e8"},{number="113",value="0x0"},{number="114",value="0x0"},{number="115",value="0x0"},{number="116",value="0x0"},{number="117",value="0x0"},{number="118",value="0x0"},{number="119",value="0x0"},{number="120",value="0x0"},{number="121",value="0x0"},{number="122",value="0x0"},{number="123",value="0x0"},{number="124",value="0x0"},{number="125",value="0x0"},{number="12
+[02:50:03.807 UTC] GDB -cont-: 58 6",value="0x0"},{number="127",value="0x0"},{number="128",value="0x0"}]
+[02:50:03.807 UTC] To client: {"seq":0,"type":"response","request_seq":39,"command":"variables","success":true,"body":{"variables":[{"name":"r0","evaluateName":"$r0","value":"0x1","variablesReference":0},{"name":"r1","evaluateName":"$r1","value":"0x100d0","variablesReference":0},{"name":"r2","evaluateName":"$r2","value":"0x0","variablesReference":0},{"name":"r3","evaluateName":"$r3","value":"0x1","variablesReference":0},{"name":"r4","evaluateName":"$r4","value":"0x0","variablesReference":0},{"name":"r5","evaluateName":"$r5","value":"0x0","variablesReference":0},{"name":"r6","evaluateName":"$r6","value":"0x0","variablesReference":0},{"name":"r7","evaluateName":"$r7","value":"0x20007ff0","variablesReference":0},{"name":"r8","evaluateName":"$r8","value":"0xffffffff","variablesReference":0},{"name":"r9","evaluateName":"$r9","value":"0xffffffff","variablesReference":0},{"name":"r10","evaluateName":"$r10","value":"0xffffffff","variablesReference":0},{"name":"r11","evaluateName":"$r11","value":"0xffffffff","variablesReference":0},{"name":"r12","evaluateName":"$r12","value":"0xffffffff","variablesReference":0},{"name":"sp","evaluateName":"$sp","value":"0x20007fe0","variablesReference":0},{"name":"lr","evaluateName":"$lr","value":"0x8000e3b","variablesReference":0},{"name":"pc","evaluateName":"$pc","value":"0x800318a","variablesReference":0},{"name":"xpsr","evaluateName":"$xpsr","value":"0x1000000","variablesReference":0},{"name":"d0","evaluateName":"$d0","value":"0x0","variablesReference":0},{"name":"d1","evaluateName":"$d1","value":"0x0","variablesReference":0},{"name":"d2","evaluateName":"$d2","value":"0x0","variablesReference":0},{"name":"d3","evaluateName":"$d3","value":"0x0","variablesReference":0},{"name":"d4","evaluateName":"$d4","value":"0x0","variablesReference":0},{"name":"d5","evaluateName":"$d5","value":"0x4600000000000000","variablesReference":0},{"name":"d6","evaluateName":"$d6","value":"0x4cf4247a45aab000","variablesReference":0},{"name":"d7","evaluateName":"$d7","value":"0x3d091e840000000","variablesReference":0},{"name":"d8","evaluateName":"$d8","value":"0x0","variablesReference":0},{"name":"d9","evaluateName":"$d9","value":"0x0","variablesReference":0},{"name":"d10","evaluateName":"$d10","value":"0x0","variablesReference":0},{"name":"d11","evaluateName":"$d11","value":"0x0","variablesReference":0},{"name":"d12","evaluateName":"$d12","value":"0x0","variablesReference":0},{"name":"d13","evaluateName":"$d13","value":"0x0","variablesReference":0},{"name":"d14","evaluateName":"$d14","value":"0x0","variablesReference":0},{"name":"d15","evaluateName":"$d15","value":"0x0","variablesReference":0},{"name":"fpscr","evaluateName":"$fpscr","value":"0x10","variablesReference":0},{"name":"msp","evaluateName":"$msp","value":"0x20007fe0","variablesReference":0},{"name":"psp","evaluateName":"$psp","value":"0x0","variablesReference":0},{"name":"primask","evaluateName":"$primask","value":"0x0","variablesReference":0},{"name":"basepri","evaluateName":"$basepri","value":"0x0","variablesReference":0},{"name":"faultmask","evaluateName":"$faultmask","value":"0x0","variablesReference":0},{"name":"control","evaluateName":"$control","value":"0x4","variablesReference":0},{"name":"s0","evaluateName":"$s0","value":"0x0","variablesReference":0},{"name":"s1","evaluateName":"$s1","value":"0x0","variablesReference":0},{"name":"s2","evaluateName":"$s2","value":"0x0","variablesReference":0},{"name":"s3","evaluateName":"$s3","value":"0x0","variablesReference":0},{"name":"s4","evaluateName":"$s4","value":"0x0","variablesReference":0},{"name":"s5","evaluateName":"$s5","value":"0x0","variablesReference":0},{"name":"s6","evaluateName":"$s6","value":"0x0","variablesReference":0},{"name":"s7","evaluateName":"$s7","value":"0x0","variablesReference":0},{"name":"s8","evaluateName":"$s8","value":"0x0","variablesReference":0},{"name":"s9","evaluateName":"$s9","value":"0x0","variablesReference":0},{"name":"s10","evaluateName":"$s10","value":"0x0","variablesReference":0},{"name":"s11","evaluateName":"$s11","value":"0x46000000","variablesReference":0},{"name":"s12","evaluateName":"$s12","value":"0x45aab000","variablesReference":0},{"name":"s13","evaluateName":"$s13","value":"0x4cf4247a","variablesReference":0},{"name":"s14","evaluateName":"$s14","value":"0x40000000","variablesReference":0},{"name":"s15","evaluateName":"$s15","value":"0x3d091e8","variablesReference":0},{"name":"s16","evaluateName":"$s16","value":"0x0","variablesReference":0},{"name":"s17","evaluateName":"$s17","value":"0x0","variablesReference":0},{"name":"s18","evaluateName":"$s18","value":"0x0","variablesReference":0},{"name":"s19","evaluateName":"$s19","value":"0x0","variablesReference":0},{"name":"s20","evaluateName":"$s20","value":"0x0","variablesReference":0},{"name":"s21","evaluateName":"$s21","value":"0x0","variablesReference":0},{"name":"s22","evaluateName":"$s22","value":"0x0","variablesReference":0},{"name":"s23","evaluateName":"$s23","value":"0x0","variablesReference":0},{"name":"s24","evaluateName":"$s24","value":"0x0","variablesReference":0},{"name":"s25","evaluateName":"$s25","value":"0x0","variablesReference":0},{"name":"s26","evaluateName":"$s26","value":"0x0","variablesReference":0},{"name":"s27","evaluateName":"$s27","value":"0x0","variablesReference":0},{"name":"s28","evaluateName":"$s28","value":"0x0","variablesReference":0},{"name":"s29","evaluateName":"$s29","value":"0x0","variablesReference":0},{"name":"s30","evaluateName":"$s30","value":"0x0","variablesReference":0},{"name":"s31","evaluateName":"$s31","value":"0x0","variablesReference":0}]}}
+[02:50:14.321 UTC] From client: continue({"threadId":1})
+[02:50:14.321 UTC] GDB command: 59 -exec-continue --thread 1
+[02:50:14.337 UTC] GDB result: 59 running
+[02:50:14.337 UTC] GDB exec async: running,thread-id="all"
+[02:50:14.337 UTC] To client: {"seq":0,"type":"event","event":"continued","body":{"threadId":1,"allThreadsContinued":true}}
+[02:50:14.337 UTC] To client: {"seq":0,"type":"response","request_seq":40,"command":"continue","success":true,"body":{"allThreadsContinued":true}}
+[02:50:14.352 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 4\r\n"}}
+[02:50:14.353 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 2\r\n"}}
+[02:50:14.368 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"NVIC_DFSR_REG = 0x00000001 \r\n"}}
+[02:50:14.369 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Non-secure state\r\nStm32Device, getHaltReason, code: 5\r\n"}}
+[02:50:14.369 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 1\r\n"}}
+[02:50:14.415 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 4\r\n"}}
+[02:50:14.416 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 2\r\n"}}
+[02:50:14.431 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"NVIC_DFSR_REG = 0x00000003 \r\n"}}
+[02:50:14.431 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Non-secure state\r\n"}}
+[02:50:14.432 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Stm32Device, getHaltReason, code: 4\r\n"}}
+[02:50:14.433 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 1\r\n"}}
+[02:50:14.464 UTC] GDB notify async: breakpoint-modified,bkpt={number="4",type="breakpoint",disp="keep",enabled="y",addr="0x08003192",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="123",thread-groups=["i1"],times="1",original-location="-source c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c -line 123"}
+[02:50:14.466 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"\n"}}
+[02:50:14.466 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Breakpoint 4, main () at C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c:123\n"}}
+[02:50:14.466 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"123\t      icm_who_am_i = 0xFFU;\n"}}
+[02:50:14.466 UTC] GDB exec async: stopped,reason="breakpoint-hit",disp="keep",bkptno="4",frame={addr="0x08003192",func="main",args=[],file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="123",arch="armv8-m.main"},thread-id="1",stopped-threads="all",core="1"
+[02:50:14.466 UTC] To client: {"seq":0,"type":"event","event":"stopped","body":{"reason":"breakpoint","allThreadsStopped":true,"threadId":1}}
+[02:50:14.503 UTC] From client: readMemory({"memoryReference":"0xE000ED2C","count":4})
+[02:50:14.503 UTC] GDB command: 60 -data-read-memory-bytes -o 0 "0xE000ED2C" 4
+[02:50:14.503 UTC] From client: readMemory({"memoryReference":"0xE000ED29","count":1})
+[02:50:14.503 UTC] GDB command: 61 -data-read-memory-bytes -o 0 "0xE000ED29" 1
+[02:50:14.503 UTC] From client: readMemory({"memoryReference":"0xE000ED28","count":1})
+[02:50:14.503 UTC] GDB command: 62 -data-read-memory-bytes -o 0 "0xE000ED28" 1
+[02:50:14.503 UTC] From client: readMemory({"memoryReference":"0xE000ED2A","count":2})
+[02:50:14.503 UTC] GDB command: 63 -data-read-memory-bytes -o 0 "0xE000ED2A" 2
+[02:50:14.503 UTC] From client: readMemory({"memoryReference":"0xE000EDE4","count":1})
+[02:50:14.503 UTC] GDB command: 64 -data-read-memory-bytes -o 0 "0xE000EDE4" 1
+[02:50:14.504 UTC] From client: threads(undefined)
+[02:50:14.504 UTC] GDB command: 65 -thread-info
+[02:50:14.510 UTC] GDB result: 60 done,memory=[{begin="0xe000ed2c",offset="0x00000000",end="0xe000ed30",contents="00000000"}]
+[02:50:14.510 UTC] To client: {"seq":0,"type":"response","request_seq":41,"command":"readMemory","success":true,"body":{"data":"AAAAAA==","address":"0xe000ed2c"}}
+[02:50:14.511 UTC] GDB result: 61 done,memory=[{begin="0xe000ed29",offset="0x00000000",end="0xe000ed2a",contents="00"}]
+[02:50:14.511 UTC] To client: {"seq":0,"type":"response","request_seq":42,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ed29"}}
+[02:50:14.512 UTC] GDB result: 62 done,memory=[{begin="0xe000ed28",offset="0x00000000",end="0xe000ed29",contents="00"}]
+[02:50:14.512 UTC] To client: {"seq":0,"type":"response","request_seq":43,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ed28"}}
+[02:50:14.512 UTC] GDB result: 63 done,memory=[{begin="0xe000ed2a",offset="0x00000000",end="0xe000ed2c",contents="0000"}]
+[02:50:14.512 UTC] To client: {"seq":0,"type":"response","request_seq":44,"command":"readMemory","success":true,"body":{"data":"AAA=","address":"0xe000ed2a"}}
+[02:50:14.513 UTC] GDB result: 64 done,memory=[{begin="0xe000ede4",offset="0x00000000",end="0xe000ede5",contents="00"}]
+[02:50:14.513 UTC] To client: {"seq":0,"type":"response","request_seq":45,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ede4"}}
+[02:50:14.513 UTC] GDB result: 65 done,threads=[{id="1",target-id="Thread 1",name="main",frame={level="0",addr="0x08003192",func="main",args=[],file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="123",arch="armv8-m.main"},state="stopped",core="1"}],current-thread-id="1"
+[02:50:14.513 UTC] To client: {"seq":0,"type":"response","request_seq":46,"command":"threads","success":true,"body":{"threads":[{"id":1,"name":"main","running":false}]}}
+[02:50:14.514 UTC] From client: stackTrace({"threadId":1,"startFrame":0,"levels":20})
+[02:50:14.514 UTC] GDB command: 66 -stack-info-depth --thread 1 100
+[02:50:14.525 UTC] GDB result: 66 done,depth="1"
+[02:50:14.525 UTC] GDB command: 67 -stack-list-frames --thread 1 0 0
+[02:50:14.540 UTC] GDB result: 67 done,stack=[frame={level="0",addr="0x08003192",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="123",arch="armv8-m.main"}]
+[02:50:14.541 UTC] To client: {"seq":0,"type":"response","request_seq":47,"command":"stackTrace","success":true,"body":{"stackFrames":[{"id":1000,"source":{"name":"main.c","path":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c","sourceReference":0},"line":123,"column":0,"name":"main","instructionPointerReference":"0x08003192"}],"totalFrames":1}}
+[02:50:14.581 UTC] From client: stackTrace({"threadId":1,"startFrame":0,"levels":20})
+[02:50:14.581 UTC] GDB command: 68 -stack-info-depth --thread 1 100
+[02:50:14.588 UTC] GDB result: 68 done,depth="1"
+[02:50:14.588 UTC] GDB command: 69 -stack-list-frames --thread 1 0 0
+[02:50:14.603 UTC] GDB result: 69 done,stack=[frame={level="0",addr="0x08003192",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="123",arch="armv8-m.main"}]
+[02:50:14.603 UTC] To client: {"seq":0,"type":"response","request_seq":48,"command":"stackTrace","success":true,"body":{"stackFrames":[{"id":1001,"source":{"name":"main.c","path":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c","sourceReference":0},"line":123,"column":0,"name":"main","instructionPointerReference":"0x08003192"}],"totalFrames":1}}
+[02:50:14.997 UTC] From client: scopes({"frameId":1000})
+[02:50:14.997 UTC] To client: {"seq":0,"type":"response","request_seq":49,"command":"scopes","success":true,"body":{"scopes":[{"name":"Local","variablesReference":1000,"expensive":false},{"name":"Registers","variablesReference":1001,"expensive":true}]}}
+[02:50:14.999 UTC] From client: variables({"variablesReference":1000})
+[02:50:14.999 UTC] GDB command: 70 -stack-info-depth 100
+[02:50:15.011 UTC] GDB result: 70 done,depth="1"
+[02:50:15.011 UTC] GDB command: 71 -var-update 1 var1
+[02:50:15.016 UTC] GDB result: 71 done,changelist=[]
+[02:50:15.016 UTC] GDB command: 72 -var-update 1 var2
+[02:50:15.026 UTC] GDB result: 72 done,changelist=[]
+[02:50:15.027 UTC] To client: {"seq":0,"type":"response","request_seq":50,"command":"variables","success":true,"body":{"variables":[{"name":"icm_who_am_i","evaluateName":"icm_who_am_i","value":"0 '\\000'","type":"volatile uint8_t","memoryReference":"&(icm_who_am_i)","variablesReference":0},{"name":"icm_who_am_i_status","evaluateName":"icm_who_am_i_status","value":"HAL_ERROR","type":"volatile HAL_StatusTypeDef","memoryReference":"&(icm_who_am_i_status)","variablesReference":0}]}}
+[02:50:16.437 UTC] From client: continue({"threadId":1})
+[02:50:16.437 UTC] GDB command: 73 -exec-continue --thread 1
+[02:50:16.447 UTC] GDB result: 73 running
+[02:50:16.447 UTC] GDB exec async: running,thread-id="all"
+[02:50:16.447 UTC] To client: {"seq":0,"type":"event","event":"continued","body":{"threadId":1,"allThreadsContinued":true}}
+[02:50:16.447 UTC] To client: {"seq":0,"type":"response","request_seq":51,"command":"continue","success":true,"body":{"allThreadsContinued":true}}
+[02:50:16.462 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 4\r\n"}}
+[02:50:16.463 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 2\r\n"}}
+[02:50:16.477 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"NVIC_DFSR_REG = 0x00000001 \r\n"}}
+[02:50:16.478 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Non-secure state\r\nStm32Device, getHaltReason, code: 5\r\n"}}
+[02:50:16.478 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 1\r\n"}}
+[02:50:16.524 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 4\r\n"}}
+[02:50:16.524 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 2\r\n"}}
+[02:50:16.540 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"NVIC_DFSR_REG = 0x00000003 \r\n"}}
+[02:50:16.540 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Non-secure state\r\n"}}
+[02:50:16.541 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Stm32Device, getHaltReason, code: 4\r\n"}}
+[02:50:16.541 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 1\r\n"}}
+[02:50:16.573 UTC] GDB notify async: breakpoint-modified,bkpt={number="5",type="breakpoint",disp="keep",enabled="y",addr="0x08003196",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="126",thread-groups=["i1"],times="1",original-location="-source c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c -line 126"}
+[02:50:16.575 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"\n"}}
+[02:50:16.575 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Breakpoint 5, main () at C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c:126\n"}}
+[02:50:16.575 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"126\t    HAL_Delay(200);\n"}}
+[02:50:16.575 UTC] GDB exec async: stopped,reason="breakpoint-hit",disp="keep",bkptno="5",frame={addr="0x08003196",func="main",args=[],file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="126",arch="armv8-m.main"},thread-id="1",stopped-threads="all",core="1"
+[02:50:16.575 UTC] To client: {"seq":0,"type":"event","event":"stopped","body":{"reason":"breakpoint","allThreadsStopped":true,"threadId":1}}
+[02:50:16.608 UTC] From client: readMemory({"memoryReference":"0xE000ED2C","count":4})
+[02:50:16.608 UTC] GDB command: 74 -data-read-memory-bytes -o 0 "0xE000ED2C" 4
+[02:50:16.609 UTC] From client: readMemory({"memoryReference":"0xE000ED29","count":1})
+[02:50:16.609 UTC] GDB command: 75 -data-read-memory-bytes -o 0 "0xE000ED29" 1
+[02:50:16.609 UTC] From client: readMemory({"memoryReference":"0xE000ED28","count":1})
+[02:50:16.609 UTC] GDB command: 76 -data-read-memory-bytes -o 0 "0xE000ED28" 1
+[02:50:16.609 UTC] From client: readMemory({"memoryReference":"0xE000ED2A","count":2})
+[02:50:16.609 UTC] GDB command: 77 -data-read-memory-bytes -o 0 "0xE000ED2A" 2
+[02:50:16.609 UTC] From client: readMemory({"memoryReference":"0xE000EDE4","count":1})
+[02:50:16.609 UTC] GDB command: 78 -data-read-memory-bytes -o 0 "0xE000EDE4" 1
+[02:50:16.609 UTC] From client: threads(undefined)
+[02:50:16.609 UTC] GDB command: 79 -thread-info
+[02:50:16.618 UTC] GDB result: 74 done,memory=[{begin="0xe000ed2c",offset="0x00000000",end="0xe000ed30",contents="00000000"}]
+[02:50:16.618 UTC] To client: {"seq":0,"type":"response","request_seq":52,"command":"readMemory","success":true,"body":{"data":"AAAAAA==","address":"0xe000ed2c"}}
+[02:50:16.618 UTC] GDB result: 75 done,memory=[{begin="0xe000ed29",offset="0x00000000",end="0xe000ed2a",contents="00"}]
+[02:50:16.618 UTC] To client: {"seq":0,"type":"response","request_seq":53,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ed29"}}
+[02:50:16.619 UTC] GDB result: 76 done,memory=[{begin="0xe000ed28",offset="0x00000000",end="0xe000ed29",contents="00"}]
+[02:50:16.619 UTC] To client: {"seq":0,"type":"response","request_seq":54,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ed28"}}
+[02:50:16.619 UTC] GDB result: 77 done,memory=[{begin="0xe000ed2a",offset="0x00000000",end="0xe000ed2c",contents="0000"}]
+[02:50:16.619 UTC] To client: {"seq":0,"type":"response","request_seq":55,"command":"readMemory","success":true,"body":{"data":"AAA=","address":"0xe000ed2a"}}
+[02:50:16.620 UTC] GDB result: 78 done,memory=[{begin="0xe000ede4",offset="0x00000000",end="0xe000ede5",contents="00"}]
+[02:50:16.620 UTC] To client: {"seq":0,"type":"response","request_seq":56,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ede4"}}
+[02:50:16.620 UTC] GDB result: 79 done,threads=[{id="1",target-id="Thread 1",name="main",frame={level="0",addr="0x08003196",func="main",args=[],file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="126",arch="armv8-m.main"},state="stopped",core="1"}],current-thread-id="1"
+[02:50:16.620 UTC] To client: {"seq":0,"type":"response","request_seq":57,"command":"threads","success":true,"body":{"threads":[{"id":1,"name":"main","running":false}]}}
+[02:50:16.698 UTC] From client: stackTrace({"threadId":1,"startFrame":0,"levels":20})
+[02:50:16.698 UTC] GDB command: 80 -stack-info-depth --thread 1 100
+[02:50:16.711 UTC] GDB result: 80 done,depth="1"
+[02:50:16.711 UTC] GDB command: 81 -stack-list-frames --thread 1 0 0
+[02:50:16.727 UTC] GDB result: 81 done,stack=[frame={level="0",addr="0x08003196",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="126",arch="armv8-m.main"}]
+[02:50:16.727 UTC] To client: {"seq":0,"type":"response","request_seq":58,"command":"stackTrace","success":true,"body":{"stackFrames":[{"id":1000,"source":{"name":"main.c","path":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c","sourceReference":0},"line":126,"column":0,"name":"main","instructionPointerReference":"0x08003196"}],"totalFrames":1}}
+[02:50:17.150 UTC] From client: scopes({"frameId":1000})
+[02:50:17.150 UTC] To client: {"seq":0,"type":"response","request_seq":59,"command":"scopes","success":true,"body":{"scopes":[{"name":"Local","variablesReference":1000,"expensive":false},{"name":"Registers","variablesReference":1001,"expensive":true}]}}
+[02:50:17.153 UTC] From client: variables({"variablesReference":1000})
+[02:50:17.153 UTC] GDB command: 82 -stack-info-depth 100
+[02:50:17.164 UTC] GDB result: 82 done,depth="1"
+[02:50:17.165 UTC] GDB command: 83 -var-update 1 var1
+[02:50:17.171 UTC] GDB result: 83 done,changelist=[{name="var1",value="255 '\377'",in_scope="true",type_changed="false",has_more="0"}]
+[02:50:17.171 UTC] [Error] Failed to decode cstring '255 'ÿ''. {}
+[02:50:17.171 UTC] GDB command: 84 -var-update 1 var2
+[02:50:17.195 UTC] GDB result: 84 done,changelist=[]
+[02:50:17.195 UTC] To client: {"seq":0,"type":"response","request_seq":60,"command":"variables","success":true,"body":{"variables":[{"name":"icm_who_am_i","evaluateName":"icm_who_am_i","value":"255 'ÿ'","type":"volatile uint8_t","memoryReference":"&(icm_who_am_i)","variablesReference":0},{"name":"icm_who_am_i_status","evaluateName":"icm_who_am_i_status","value":"HAL_ERROR","type":"volatile HAL_StatusTypeDef","memoryReference":"&(icm_who_am_i_status)","variablesReference":0}]}}
+[02:50:19.315 UTC] From client: continue({"threadId":1})
+[02:50:19.315 UTC] GDB command: 85 -exec-continue --thread 1
+[02:50:19.320 UTC] GDB result: 85 running
+[02:50:19.320 UTC] GDB exec async: running,thread-id="all"
+[02:50:19.320 UTC] To client: {"seq":0,"type":"event","event":"continued","body":{"threadId":1,"allThreadsContinued":true}}
+[02:50:19.320 UTC] To client: {"seq":0,"type":"response","request_seq":61,"command":"continue","success":true,"body":{"allThreadsContinued":true}}
+[02:50:19.335 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 4\r\n"}}
+[02:50:19.336 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 2\r\n"}}
+[02:50:19.351 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"NVIC_DFSR_REG = 0x00000001 \r\n"}}
+[02:50:19.352 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Non-secure state\r\nStm32Device, getHaltReason, code: 5\r\n"}}
+[02:50:19.352 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 1\r\n"}}
+[02:50:19.397 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 4\r\n"}}
+[02:50:19.397 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session, device event: 2\r\n"}}
+[02:50:19.413 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"ST-LINK device status: RUN_MODE\r\n"}}
+[02:50:19.600 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"ST-LINK device status: HALT_MODE\r\n"}}
+[02:50:19.600 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"NVIC_DFSR_REG = 0x00000003 \r\n"}}
+[02:50:19.601 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Non-secure state\r\n"}}
+[02:50:19.603 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Stm32Device, getHaltReason, code: 4\r\nGDB session, device event: 1\r\n"}}
+[02:50:19.633 UTC] GDB notify async: breakpoint-modified,bkpt={number="2",type="breakpoint",disp="keep",enabled="y",addr="0x0800316e",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="113",thread-groups=["i1"],times="2",original-location="-source c:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c -line 113"}
+[02:50:19.636 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"\n"}}
+[02:50:19.636 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"Breakpoint 2, main () at C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c:113\n"}}
+[02:50:19.636 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"stdout","output":"113\t    icm_who_am_i_status = HAL_I2C_Mem_Read(&hi2c2,\n"}}
+[02:50:19.636 UTC] GDB exec async: stopped,reason="breakpoint-hit",disp="keep",bkptno="2",frame={addr="0x0800316e",func="main",args=[],file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="113",arch="armv8-m.main"},thread-id="1",stopped-threads="all",core="1"
+[02:50:19.636 UTC] To client: {"seq":0,"type":"event","event":"stopped","body":{"reason":"breakpoint","allThreadsStopped":true,"threadId":1}}
+[02:50:19.637 UTC] From client: readMemory({"memoryReference":"0xE000ED2C","count":4})
+[02:50:19.637 UTC] GDB command: 86 -data-read-memory-bytes -o 0 "0xE000ED2C" 4
+[02:50:19.637 UTC] From client: readMemory({"memoryReference":"0xE000ED29","count":1})
+[02:50:19.637 UTC] GDB command: 87 -data-read-memory-bytes -o 0 "0xE000ED29" 1
+[02:50:19.637 UTC] From client: readMemory({"memoryReference":"0xE000ED28","count":1})
+[02:50:19.637 UTC] GDB command: 88 -data-read-memory-bytes -o 0 "0xE000ED28" 1
+[02:50:19.637 UTC] From client: readMemory({"memoryReference":"0xE000ED2A","count":2})
+[02:50:19.637 UTC] GDB command: 89 -data-read-memory-bytes -o 0 "0xE000ED2A" 2
+[02:50:19.637 UTC] From client: readMemory({"memoryReference":"0xE000EDE4","count":1})
+[02:50:19.637 UTC] GDB command: 90 -data-read-memory-bytes -o 0 "0xE000EDE4" 1
+[02:50:19.638 UTC] From client: threads(undefined)
+[02:50:19.638 UTC] GDB command: 91 -thread-info
+[02:50:19.661 UTC] GDB result: 86 done,memory=[{begin="0xe000ed2c",offset="0x00000000",end="0xe000ed30",contents="00000000"}]
+[02:50:19.661 UTC] To client: {"seq":0,"type":"response","request_seq":62,"command":"readMemory","success":true,"body":{"data":"AAAAAA==","address":"0xe000ed2c"}}
+[02:50:19.661 UTC] GDB result: 87 done,memory=[{begin="0xe000ed29",offset="0x00000000",end="0xe000ed2a",contents="00"}]
+[02:50:19.661 UTC] To client: {"seq":0,"type":"response","request_seq":63,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ed29"}}
+[02:50:19.662 UTC] GDB result: 88 done,memory=[{begin="0xe000ed28",offset="0x00000000",end="0xe000ed29",contents="00"}]
+[02:50:19.662 UTC] To client: {"seq":0,"type":"response","request_seq":64,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ed28"}}
+[02:50:19.662 UTC] GDB result: 89 done,memory=[{begin="0xe000ed2a",offset="0x00000000",end="0xe000ed2c",contents="0000"}]
+[02:50:19.662 UTC] To client: {"seq":0,"type":"response","request_seq":65,"command":"readMemory","success":true,"body":{"data":"AAA=","address":"0xe000ed2a"}}
+[02:50:19.663 UTC] GDB result: 90 done,memory=[{begin="0xe000ede4",offset="0x00000000",end="0xe000ede5",contents="00"}]
+[02:50:19.663 UTC] To client: {"seq":0,"type":"response","request_seq":66,"command":"readMemory","success":true,"body":{"data":"AA==","address":"0xe000ede4"}}
+[02:50:19.663 UTC] GDB result: 91 done,threads=[{id="1",target-id="Thread 1",name="main",frame={level="0",addr="0x0800316e",func="main",args=[],file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="113",arch="armv8-m.main"},state="stopped",core="1"}],current-thread-id="1"
+[02:50:19.663 UTC] To client: {"seq":0,"type":"response","request_seq":67,"command":"threads","success":true,"body":{"threads":[{"id":1,"name":"main","running":false}]}}
+[02:50:19.749 UTC] From client: stackTrace({"threadId":1,"startFrame":0,"levels":20})
+[02:50:19.749 UTC] GDB command: 92 -stack-info-depth --thread 1 100
+[02:50:19.753 UTC] GDB result: 92 done,depth="1"
+[02:50:19.753 UTC] GDB command: 93 -stack-list-frames --thread 1 0 0
+[02:50:19.753 UTC] GDB result: 93 done,stack=[frame={level="0",addr="0x0800316e",func="main",file="C:/Users/AnthonyPC/Documents/GitHub/ICM42670_Driver/Core/Src/main.c",fullname="C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c",line="113",arch="armv8-m.main"}]
+[02:50:19.753 UTC] To client: {"seq":0,"type":"response","request_seq":68,"command":"stackTrace","success":true,"body":{"stackFrames":[{"id":1000,"source":{"name":"main.c","path":"C:\\Users\\AnthonyPC\\Documents\\GitHub\\ICM42670_Driver\\Core\\Src\\main.c","sourceReference":0},"line":113,"column":0,"name":"main","instructionPointerReference":"0x0800316e"}],"totalFrames":1}}
+[02:50:20.159 UTC] From client: scopes({"frameId":1000})
+[02:50:20.159 UTC] To client: {"seq":0,"type":"response","request_seq":69,"command":"scopes","success":true,"body":{"scopes":[{"name":"Local","variablesReference":1000,"expensive":false},{"name":"Registers","variablesReference":1001,"expensive":true}]}}
+[02:50:20.160 UTC] From client: variables({"variablesReference":1000})
+[02:50:20.160 UTC] GDB command: 94 -stack-info-depth 100
+[02:50:20.174 UTC] GDB result: 94 done,depth="1"
+[02:50:20.174 UTC] GDB command: 95 -var-update 1 var1
+[02:50:20.192 UTC] GDB result: 95 done,changelist=[]
+[02:50:20.192 UTC] GDB command: 96 -var-update 1 var2
+[02:50:20.205 UTC] GDB result: 96 done,changelist=[]
+[02:50:20.205 UTC] To client: {"seq":0,"type":"response","request_seq":70,"command":"variables","success":true,"body":{"variables":[{"name":"icm_who_am_i","evaluateName":"icm_who_am_i","value":"255 'ÿ'","type":"volatile uint8_t","memoryReference":"&(icm_who_am_i)","variablesReference":0},{"name":"icm_who_am_i_status","evaluateName":"icm_who_am_i_status","value":"HAL_ERROR","type":"volatile HAL_StatusTypeDef","memoryReference":"&(icm_who_am_i_status)","variablesReference":0}]}}
+[02:51:12.796 UTC] From client: disconnect({"restart":false})
+[02:51:12.796 UTC] GDB command: 97 -gdb-exit
+[02:51:12.812 UTC] GDB result: 97 exit
+[02:51:12.812 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"GDB session terminated \r\nGdbSessionManager, session terminated: 1\r\nGdbSrv, last session terminated, signal dispose\r\nStopping port 61234\r\n"}}
+[02:51:12.812 UTC] GDB notify async: thread-exited,id="1",group-id="i1"
+[02:51:12.813 UTC] GDB notify async: thread-group-exited,id="i1"
+[02:51:12.814 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"cube is killed by signal SIGTERM"}}
+[02:51:12.815 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"gdbserver stopped"}}
+[02:51:12.815 UTC] To client: {"seq":0,"type":"response","request_seq":71,"command":"disconnect","success":true}
+[02:51:12.828 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Cleanup session: 1\r\nGDB session disposed: 1\r\n"}}
+[02:51:12.890 UTC] To client: {"seq":0,"type":"event","event":"output","body":{"category":"server","output":"Received stop for port 61234, not accepting new connections.\r\nGdbSrv, deInit entry.\r\nShutting down...\r\nGdbSessionManager, deInit entry.\r\n"}}
