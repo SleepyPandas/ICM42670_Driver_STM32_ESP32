@@ -35,6 +35,9 @@
 #define ICM42670_I2C_ADDR       (0x68U << 1)
 #define ICM42670_REG_WHO_AM_I   0x75U
 #define ICM42670_WHO_AM_I_VALUE 0x67U
+#define ICM42670_SPI_READ_MASK  0x80U
+#define ICM42670_SPI_CS_GPIO_Port CS_SPI_GPIO_Port
+#define ICM42670_SPI_CS_Pin       CS_SPI_Pin
 
 /* USER CODE END PD */
 
@@ -47,7 +50,13 @@
 
 I2C_HandleTypeDef hi2c2;
 
+SPI_HandleTypeDef hspi1;
+
 /* USER CODE BEGIN PV */
+volatile uint8_t icm42670_who_am_i = 0U;
+volatile HAL_StatusTypeDef icm42670_who_am_i_status = HAL_ERROR;
+volatile uint8_t icm42670_detected = 0U;
+volatile uint32_t icm42670_spi_error = HAL_SPI_ERROR_NONE;
 
 /* USER CODE END PV */
 
@@ -56,12 +65,43 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ICACHE_Init(void);
 static void MX_I2C2_Init(void);
+static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
+static HAL_StatusTypeDef ICM42670_SPI_ReadReg(uint8_t reg, uint8_t *value);
+static void ICM42670_TestWhoAmI(void);
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+static HAL_StatusTypeDef ICM42670_SPI_ReadReg(uint8_t reg, uint8_t *value)
+{
+  HAL_StatusTypeDef status;
+  uint8_t tx[2] = { (uint8_t)(reg | ICM42670_SPI_READ_MASK), 0x00U };
+  uint8_t rx[2] = { 0x00U, 0x00U };
+
+  HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin, GPIO_PIN_RESET);
+  status = HAL_SPI_TransmitReceive(&hspi1, tx, rx, 2, 100);
+  HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin, GPIO_PIN_SET);
+
+  if ((status == HAL_OK) && (value != NULL))
+  {
+    *value = rx[1];
+  }
+
+  return status;
+}
+
+static void ICM42670_TestWhoAmI(void)
+{
+  icm42670_who_am_i = 0U;
+  icm42670_who_am_i_status = ICM42670_SPI_ReadReg(ICM42670_REG_WHO_AM_I,
+                                                  (uint8_t *)&icm42670_who_am_i);
+  icm42670_spi_error = hspi1.ErrorCode;
+  icm42670_detected = ((icm42670_who_am_i_status == HAL_OK) &&
+                       (icm42670_who_am_i == ICM42670_WHO_AM_I_VALUE)) ? 1U : 0U;
+}
 
 /* USER CODE END 0 */
 
@@ -96,10 +136,11 @@ int main(void)
   MX_GPIO_Init();
   MX_ICACHE_Init();
   MX_I2C2_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-
-  volatile uint8_t icm_who_am_i = 0U;
-  volatile HAL_StatusTypeDef icm_who_am_i_status;
+  HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin, GPIO_PIN_SET);
+  HAL_Delay(20);
+  ICM42670_TestWhoAmI();
 
   /* USER CODE END 2 */
 
@@ -110,20 +151,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    icm_who_am_i_status = HAL_I2C_Mem_Read(&hi2c2,
-                                           ICM42670_I2C_ADDR,
-                                           ICM42670_REG_WHO_AM_I,
-                                           I2C_MEMADD_SIZE_8BIT,
-                                           (uint8_t *)&icm_who_am_i,
-                                           1,
-                                           100);
-
-    if (icm_who_am_i_status != HAL_OK)
-    {
-      icm_who_am_i = 0xFFU;
-    }
-
-    HAL_Delay(200);
+    HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }
@@ -261,6 +289,54 @@ static void MX_ICACHE_Init(void)
 }
 
 /**
+  * @brief SPI1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI1_Init(void)
+{
+
+  /* USER CODE BEGIN SPI1_Init 0 */
+
+  /* USER CODE END SPI1_Init 0 */
+
+  /* USER CODE BEGIN SPI1_Init 1 */
+
+  /* USER CODE END SPI1_Init 1 */
+  /* SPI1 parameter configuration*/
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 0x7;
+  hspi1.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
+  hspi1.Init.NSSPolarity = SPI_NSS_POLARITY_LOW;
+  hspi1.Init.FifoThreshold = SPI_FIFO_THRESHOLD_01DATA;
+  hspi1.Init.MasterSSIdleness = SPI_MASTER_SS_IDLENESS_00CYCLE;
+  hspi1.Init.MasterInterDataIdleness = SPI_MASTER_INTERDATA_IDLENESS_00CYCLE;
+  hspi1.Init.MasterReceiverAutoSusp = SPI_MASTER_RX_AUTOSUSP_DISABLE;
+  hspi1.Init.MasterKeepIOState = SPI_MASTER_KEEP_IO_STATE_DISABLE;
+  hspi1.Init.IOSwap = SPI_IO_SWAP_DISABLE;
+  hspi1.Init.ReadyMasterManagement = SPI_RDY_MASTER_MANAGEMENT_INTERNALLY;
+  hspi1.Init.ReadyPolarity = SPI_RDY_POLARITY_HIGH;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI1_Init 2 */
+
+  /* USER CODE END SPI1_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -279,7 +355,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LCD_RES_GPIO_Port, LCD_RES_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LCD_RES_Pin|CS_SPI_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LCD_DC_GPIO_Port, LCD_DC_Pin, GPIO_PIN_RESET);
@@ -293,14 +369,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.Alternate = GPIO_AF13_USART3;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : LCD_SCK_Pin LCD_MOSI_Pin */
-  GPIO_InitStruct.Pin = LCD_SCK_Pin|LCD_MOSI_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : ARD_D1_TX_Pin ARD_D0_RX_Pin */
@@ -317,6 +385,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(LCD_RES_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : CS_SPI_Pin */
+  GPIO_InitStruct.Pin = CS_SPI_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(CS_SPI_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LCD_DC_Pin LCD_CS_Pin */
   GPIO_InitStruct.Pin = LCD_DC_Pin|LCD_CS_Pin;
