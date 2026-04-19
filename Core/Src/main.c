@@ -1,27 +1,27 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2026 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,12 +32,13 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define ICM42670_I2C_ADDR       (0x68U << 1)
-#define ICM42670_REG_WHO_AM_I   0x75U
-#define ICM42670_WHO_AM_I_VALUE 0x67U
-#define ICM42670_SPI_READ_MASK  0x80U
+#define ICM42670_REG_WHO_AM_I 0x75U
+#define ICM42670_SPI_READ_MASK 0x80U
 #define ICM42670_SPI_CS_GPIO_Port CS_SPI_GPIO_Port
-#define ICM42670_SPI_CS_Pin       CS_SPI_Pin
+#define ICM42670_SPI_CS_Pin CS_SPI_Pin
+#define ICM42670_I2C_ADDR_LOW (0x68U << 1)
+#define ICM42670_I2C_ADDR_HIGH (0x69U << 1)
+#define ICM42670_EXPECTED_WHO_AM_I 0x67U
 
 /* USER CODE END PD */
 
@@ -48,15 +49,11 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-I2C_HandleTypeDef hi2c2;
+I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
-volatile uint8_t icm42670_who_am_i = 0U;
-volatile HAL_StatusTypeDef icm42670_who_am_i_status = HAL_ERROR;
-volatile uint8_t icm42670_detected = 0U;
-volatile uint32_t icm42670_spi_error = HAL_SPI_ERROR_NONE;
 
 /* USER CODE END PV */
 
@@ -64,44 +61,14 @@ volatile uint32_t icm42670_spi_error = HAL_SPI_ERROR_NONE;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ICACHE_Init(void);
-static void MX_I2C2_Init(void);
 static void MX_SPI1_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
-static HAL_StatusTypeDef ICM42670_SPI_ReadReg(uint8_t reg, uint8_t *value);
-static void ICM42670_TestWhoAmI(void);
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-static HAL_StatusTypeDef ICM42670_SPI_ReadReg(uint8_t reg, uint8_t *value)
-{
-  HAL_StatusTypeDef status;
-  uint8_t tx[2] = { (uint8_t)(reg | ICM42670_SPI_READ_MASK), 0x00U };
-  uint8_t rx[2] = { 0x00U, 0x00U };
-
-  HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin, GPIO_PIN_RESET);
-  status = HAL_SPI_TransmitReceive(&hspi1, tx, rx, 2, 100);
-  HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin, GPIO_PIN_SET);
-
-  if ((status == HAL_OK) && (value != NULL))
-  {
-    *value = rx[1];
-  }
-
-  return status;
-}
-
-static void ICM42670_TestWhoAmI(void)
-{
-  icm42670_who_am_i = 0U;
-  icm42670_who_am_i_status = ICM42670_SPI_ReadReg(ICM42670_REG_WHO_AM_I,
-                                                  (uint8_t *)&icm42670_who_am_i);
-  icm42670_spi_error = hspi1.ErrorCode;
-  icm42670_detected = ((icm42670_who_am_i_status == HAL_OK) &&
-                       (icm42670_who_am_i == ICM42670_WHO_AM_I_VALUE)) ? 1U : 0U;
-}
 
 /* USER CODE END 0 */
 
@@ -135,23 +102,86 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ICACHE_Init();
-  MX_I2C2_Init();
   MX_SPI1_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin, GPIO_PIN_SET);
-  HAL_Delay(20);
-  ICM42670_TestWhoAmI();
-
+  HAL_StatusTypeDef i2c_status;
+  HAL_StatusTypeDef spi_status;
+  uint8_t Who_Value_I2C = 0;
+  uint8_t Who_Value_SPI = 0;
+  uint8_t tx_data = ICM42670_REG_WHO_AM_I | ICM42670_SPI_READ_MASK;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+  while (1) {
+    HAL_Delay(10);
+    Who_Value_I2C = 0;
+    Who_Value_SPI = 0;
+
+    HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin,
+                      GPIO_PIN_SET);
+
+    i2c_status = HAL_I2C_Mem_Read(&hi2c1, ICM42670_I2C_ADDR_LOW,
+                                  ICM42670_REG_WHO_AM_I,
+                                  I2C_MEMADD_SIZE_8BIT, &Who_Value_I2C, 1,
+                                  HAL_MAX_DELAY);
+
+    if (i2c_status != HAL_OK) {
+      i2c_status = HAL_I2C_Mem_Read(&hi2c1, ICM42670_I2C_ADDR_HIGH,
+                                    ICM42670_REG_WHO_AM_I,
+                                    I2C_MEMADD_SIZE_8BIT, &Who_Value_I2C, 1,
+                                    HAL_MAX_DELAY);
+    }
+
+    // HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin,
+    //                   GPIO_PIN_RESET);
+
+    // spi_status = HAL_SPI_Transmit(&hspi1, &tx_data, 1, 100);
+
+    // if (spi_status == HAL_OK) {
+    //   spi_status = HAL_SPI_Receive(&hspi1, &Who_Value_SPI, 1, 100);
+    // }
+
+    // HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin,
+    //                   GPIO_PIN_SET);
+
+
+    if (i2c_status == HAL_OK) {
+      if (Who_Value_I2C == ICM42670_EXPECTED_WHO_AM_I) {
+        /* WHO_AM_I value is correct, sensor is detected. */
+        /* You can add your application code here to handle the detected sensor.
+         */
+        /* Keep running so you can inspect Who_Value while debugging. */
+
+      } else {
+        /* WHO_AM_I value is incorrect, sensor might not be detected or there is
+         * a communication issue. */
+        /* You can add error handling code here. */
+      }
+    } else {
+      /* I2C communication failed, handle the error accordingly. */
+      /* You can add error handling code here. */
+     
+    }
+
+    if (spi_status == HAL_OK) {
+      if (Who_Value_SPI == ICM42670_EXPECTED_WHO_AM_I) {
+        /* SPI WHO_AM_I value is correct. */
+      } else {
+        /* SPI WHO_AM_I value is incorrect. */
+      }
+    } else {
+      /* SPI communication failed. */
+      printf("test\n");
+    }
+
+    printf("test\n");
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    HAL_Delay(500);
+    /* Continuous SPI traffic for logic analyzer capture. */
   }
   /* USER CODE END 3 */
 }
@@ -213,50 +243,50 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief I2C2 Initialization Function
+  * @brief I2C1 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_I2C2_Init(void)
+static void MX_I2C1_Init(void)
 {
 
-  /* USER CODE BEGIN I2C2_Init 0 */
+  /* USER CODE BEGIN I2C1_Init 0 */
 
-  /* USER CODE END I2C2_Init 0 */
+  /* USER CODE END I2C1_Init 0 */
 
-  /* USER CODE BEGIN I2C2_Init 1 */
+  /* USER CODE BEGIN I2C1_Init 1 */
 
-  /* USER CODE END I2C2_Init 1 */
-  hi2c2.Instance = I2C2;
-  hi2c2.Init.Timing = 0x10807DBC;
-  hi2c2.Init.OwnAddress1 = 0;
-  hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  hi2c2.Init.OwnAddress2 = 0;
-  hi2c2.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
-  hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c2) != HAL_OK)
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.Timing = 0x10807DBC;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
   {
     Error_Handler();
   }
 
   /** Configure Analogue filter
   */
-  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c2, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
   {
     Error_Handler();
   }
 
   /** Configure Digital filter
   */
-  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c2, 0) != HAL_OK)
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN I2C2_Init 2 */
+  /* USER CODE BEGIN I2C1_Init 2 */
 
-  /* USER CODE END I2C2_Init 2 */
+  /* USER CODE END I2C1_Init 2 */
 
 }
 
@@ -311,7 +341,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -355,13 +385,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, LCD_RES_Pin|CS_SPI_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LCD_DC_GPIO_Port, LCD_DC_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOC, LCD_DC_Pin|LCD_RES_Pin|CS_SPI_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : T_VCP_RX_Pin T_VCP_TX_Pin */
   GPIO_InitStruct.Pin = T_VCP_RX_Pin|T_VCP_TX_Pin;
@@ -379,26 +403,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF4_USART1;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LCD_RES_Pin */
-  GPIO_InitStruct.Pin = LCD_RES_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(LCD_RES_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : CS_SPI_Pin */
-  GPIO_InitStruct.Pin = CS_SPI_Pin;
+  /*Configure GPIO pins : LCD_DC_Pin LCD_RES_Pin CS_SPI_Pin */
+  GPIO_InitStruct.Pin = LCD_DC_Pin|LCD_RES_Pin|CS_SPI_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(CS_SPI_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : LCD_DC_Pin LCD_CS_Pin */
-  GPIO_InitStruct.Pin = LCD_DC_Pin|LCD_CS_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
@@ -418,8 +428,7 @@ void Error_Handler(void)
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
-  while (1)
-  {
+  while (1) {
   }
   /* USER CODE END Error_Handler_Debug */
 }
@@ -434,8 +443,9 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* User can add his own implementation to report the file name and line
+     number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file,
+     line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

@@ -389,3 +389,5 @@ MiscMySTuff2.md
 
 *.txt
 .txt
+gdbClient_log.txt
+stlinkgdbserver_log.txt
