@@ -33,12 +33,20 @@
 /* USER CODE BEGIN PD */
 
 #define ICM42670_REG_WHO_AM_I 0x75U
-#define ICM42670_SPI_READ_MASK 0x80U
 #define ICM42670_SPI_CS_GPIO_Port CS_SPI_GPIO_Port
 #define ICM42670_SPI_CS_Pin CS_SPI_Pin
 #define ICM42670_I2C_ADDR_LOW (0x68U << 1)
 #define ICM42670_I2C_ADDR_HIGH (0x69U << 1)
 #define ICM42670_EXPECTED_WHO_AM_I 0x67U
+#define ICM42670_REG_TEMP_DATA1 0x09U
+#define ICM42670_REG_ACCEL_DATA_X1 0x0BU
+#define ICM42670_REG_ACCEL_DATA_Y1 0x0DU
+#define ICM42670_REG_ACCEL_DATA_Z1 0x0FU
+#define ICM42670_REG_GYRO_DATA_X1 0x11U
+#define ICM42670_REG_GYRO_DATA_Y1 0x13U
+#define ICM42670_REG_GYRO_DATA_Z1 0x15U
+#define ICM42670_REG_PWR_MGMT0 0x1FU
+#define ICM42670_PWR_ACCEL_GYRO_LN 0x0FU
 
 /* USER CODE END PD */
 
@@ -72,6 +80,35 @@ static void MX_USART3_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+static int16_t ICM42670_CombineBytes(uint8_t msb, uint8_t lsb)
+{
+  return (int16_t)(((uint16_t)msb << 8U) | (uint16_t)lsb);
+}
+
+static HAL_StatusTypeDef ICM42670_ReadInt16(I2C_HandleTypeDef *hi2c,
+                                            uint8_t dev_addr,
+                                            uint8_t reg_addr,
+                                            int16_t *out)
+{
+  HAL_StatusTypeDef status;
+  uint8_t raw[2] = {0};
+
+  status = HAL_I2C_Mem_Read(hi2c, dev_addr, reg_addr, I2C_MEMADD_SIZE_8BIT,
+                            raw, 2, HAL_MAX_DELAY);
+  if (status == HAL_OK) {
+    *out = ICM42670_CombineBytes(raw[0], raw[1]);
+  }
+
+  return status;
+}
+
+int __io_putchar(int ch)
+{
+  uint8_t c = (uint8_t)ch;
+  (void)HAL_UART_Transmit(&huart3, &c, 1, HAL_MAX_DELAY);
+  return ch;
+}
 
 /* USER CODE END 0 */
 
@@ -110,77 +147,110 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_StatusTypeDef i2c_status;
-  HAL_StatusTypeDef spi_status;
-  uint8_t Who_Value_I2C = 0;
-  uint8_t Who_Value_SPI = 0;
-  uint8_t tx_data = ICM42670_REG_WHO_AM_I | ICM42670_SPI_READ_MASK;
+  uint8_t who_value_i2c = 0;
+  uint8_t active_i2c_addr = ICM42670_I2C_ADDR_LOW;
+  uint8_t sensor_cfg_done = 0;
+  int16_t temp_raw;
+  int16_t accel_x;
+  int16_t accel_y;
+  int16_t accel_z;
+  int16_t gyro_x;
+  int16_t gyro_y;
+  int16_t gyro_z;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-    HAL_Delay(10);
-    Who_Value_I2C = 0;
-    Who_Value_SPI = 0;
+    HAL_Delay(100);
+    who_value_i2c = 0;
 
     HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin,
                       GPIO_PIN_SET);
 
     i2c_status = HAL_I2C_Mem_Read(&hi2c1, ICM42670_I2C_ADDR_LOW,
                                   ICM42670_REG_WHO_AM_I,
-                                  I2C_MEMADD_SIZE_8BIT, &Who_Value_I2C, 1,
+                                  I2C_MEMADD_SIZE_8BIT, &who_value_i2c, 1,
                                   HAL_MAX_DELAY);
 
     if (i2c_status != HAL_OK) {
       i2c_status = HAL_I2C_Mem_Read(&hi2c1, ICM42670_I2C_ADDR_HIGH,
                                     ICM42670_REG_WHO_AM_I,
-                                    I2C_MEMADD_SIZE_8BIT, &Who_Value_I2C, 1,
+                                    I2C_MEMADD_SIZE_8BIT, &who_value_i2c, 1,
                                     HAL_MAX_DELAY);
+      if (i2c_status == HAL_OK) {
+        active_i2c_addr = ICM42670_I2C_ADDR_HIGH;
+      }
+    } else {
+      active_i2c_addr = ICM42670_I2C_ADDR_LOW;
     }
-
-    // HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin,
-    //                   GPIO_PIN_RESET);
-
-    // spi_status = HAL_SPI_Transmit(&hspi1, &tx_data, 1, 100);
-
-    // if (spi_status == HAL_OK) {
-    //   spi_status = HAL_SPI_Receive(&hspi1, &Who_Value_SPI, 1, 100);
-    // }
-
-    // HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin,
-    //                   GPIO_PIN_SET);
-
 
     if (i2c_status == HAL_OK) {
-      if (Who_Value_I2C == ICM42670_EXPECTED_WHO_AM_I) {
-        /* WHO_AM_I value is correct, sensor is detected. */
-        /* You can add your application code here to handle the detected sensor.
-         */
-        /* Keep running so you can inspect Who_Value while debugging. */
+      if (who_value_i2c == ICM42670_EXPECTED_WHO_AM_I) {
+        if (sensor_cfg_done == 0U) {
+          uint8_t pwr_cfg = ICM42670_PWR_ACCEL_GYRO_LN;
+          HAL_StatusTypeDef cfg_status = HAL_I2C_Mem_Write(
+              &hi2c1, active_i2c_addr, ICM42670_REG_PWR_MGMT0,
+              I2C_MEMADD_SIZE_8BIT, &pwr_cfg, 1, HAL_MAX_DELAY);
 
+          if (cfg_status == HAL_OK) {
+            sensor_cfg_done = 1U;
+            printf("ICM42670 detected at 0x%02X, streaming raw values over UART\r\n",
+                   active_i2c_addr >> 1);
+            HAL_Delay(50);
+          } else {
+            printf("ICM42670 config write failed (status=%d)\r\n", cfg_status);
+            continue;
+          }
+        }
+
+        i2c_status = ICM42670_ReadInt16(&hi2c1, active_i2c_addr,
+                                        ICM42670_REG_TEMP_DATA1, &temp_raw);
+        if (i2c_status == HAL_OK) {
+          i2c_status = ICM42670_ReadInt16(&hi2c1, active_i2c_addr,
+                                          ICM42670_REG_ACCEL_DATA_X1,
+                                          &accel_x);
+        }
+        if (i2c_status == HAL_OK) {
+          i2c_status = ICM42670_ReadInt16(&hi2c1, active_i2c_addr,
+                                          ICM42670_REG_ACCEL_DATA_Y1,
+                                          &accel_y);
+        }
+        if (i2c_status == HAL_OK) {
+          i2c_status = ICM42670_ReadInt16(&hi2c1, active_i2c_addr,
+                                          ICM42670_REG_ACCEL_DATA_Z1,
+                                          &accel_z);
+        }
+        if (i2c_status == HAL_OK) {
+          i2c_status = ICM42670_ReadInt16(&hi2c1, active_i2c_addr,
+                                          ICM42670_REG_GYRO_DATA_X1,
+                                          &gyro_x);
+        }
+        if (i2c_status == HAL_OK) {
+          i2c_status = ICM42670_ReadInt16(&hi2c1, active_i2c_addr,
+                                          ICM42670_REG_GYRO_DATA_Y1,
+                                          &gyro_y);
+        }
+        if (i2c_status == HAL_OK) {
+          i2c_status = ICM42670_ReadInt16(&hi2c1, active_i2c_addr,
+                                          ICM42670_REG_GYRO_DATA_Z1,
+                                          &gyro_z);
+        }
+
+        if (i2c_status == HAL_OK) {
+          printf("WHO=0x%02X T=%d AX=%d AY=%d AZ=%d GX=%d GY=%d GZ=%d\r\n",
+                 who_value_i2c, temp_raw, accel_x, accel_y, accel_z, gyro_x,
+                 gyro_y, gyro_z);
+        } else {
+          printf("I2C frame read failed (status=%d)\r\n", i2c_status);
+        }
       } else {
-        /* WHO_AM_I value is incorrect, sensor might not be detected or there is
-         * a communication issue. */
-        /* You can add error handling code here. */
+        printf("Unexpected WHO_AM_I: 0x%02X\r\n", who_value_i2c);
       }
     } else {
-      /* I2C communication failed, handle the error accordingly. */
-      /* You can add error handling code here. */
-     
+      printf("I2C WHO_AM_I read failed on 0x68 and 0x69 (status=%d)\r\n",
+             i2c_status);
     }
-
-    if (spi_status == HAL_OK) {
-      if (Who_Value_SPI == ICM42670_EXPECTED_WHO_AM_I) {
-        /* SPI WHO_AM_I value is correct. */
-      } else {
-        /* SPI WHO_AM_I value is incorrect. */
-      }
-    } else {
-      /* SPI communication failed. */
-      printf("test\n");
-    }
-
-    printf("test\n");
 
     /* USER CODE END WHILE */
 
