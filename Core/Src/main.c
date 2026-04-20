@@ -162,7 +162,6 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-    HAL_Delay(100);
     who_value_i2c = 0;
 
     HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin,
@@ -332,7 +331,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x10807DBC;
+  hi2c1.Init.Timing = 0x00300B28;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -355,6 +354,13 @@ static void MX_I2C1_Init(void)
   /** Configure Digital filter
   */
   if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** I2C Fast mode Plus enable
+  */
+  if (HAL_I2CEx_ConfigFastModePlus(&hi2c1, I2C_FASTMODEPLUS_ENABLE) != HAL_OK)
   {
     Error_Handler();
   }
