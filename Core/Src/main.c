@@ -35,8 +35,7 @@
 #define ICM42670_REG_WHO_AM_I 0x75U
 #define ICM42670_SPI_CS_GPIO_Port CS_SPI_GPIO_Port
 #define ICM42670_SPI_CS_Pin CS_SPI_Pin
-#define ICM42670_I2C_ADDR_LOW (0x68U << 1)
-#define ICM42670_I2C_ADDR_HIGH (0x69U << 1)
+#define ICM42670_SPI_READ_BIT 0x80U
 #define ICM42670_EXPECTED_WHO_AM_I 0x67U
 #define ICM42670_REG_TEMP_DATA1 0x09U
 #define ICM42670_REG_ACCEL_DATA_X1 0x0BU
@@ -47,6 +46,7 @@
 #define ICM42670_REG_GYRO_DATA_Z1 0x15U
 #define ICM42670_REG_PWR_MGMT0 0x1FU
 #define ICM42670_PWR_ACCEL_GYRO_LN 0x0FU
+#define ICM42670_DATA_FRAME_LEN 14U
 
 /* USER CODE END PD */
 
@@ -86,19 +86,64 @@ static int16_t ICM42670_CombineBytes(uint8_t msb, uint8_t lsb)
   return (int16_t)(((uint16_t)msb << 8U) | (uint16_t)lsb);
 }
 
-static HAL_StatusTypeDef ICM42670_ReadInt16(I2C_HandleTypeDef *hi2c,
-                                            uint8_t dev_addr,
-                                            uint8_t reg_addr,
-                                            int16_t *out)
+static void ICM42670_Select(void)
+{
+  HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin,
+                    GPIO_PIN_RESET);
+}
+
+static void ICM42670_Deselect(void)
+{
+  HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin,
+                    GPIO_PIN_SET);
+}
+
+static HAL_StatusTypeDef ICM42670_ReadRegisters(SPI_HandleTypeDef *hspi,
+                                                uint8_t reg_addr,
+                                                uint8_t *data,
+                                                uint8_t len)
 {
   HAL_StatusTypeDef status;
-  uint8_t raw[2] = {0};
+  uint8_t tx[1U + ICM42670_DATA_FRAME_LEN] = {0};
+  uint8_t rx[1U + ICM42670_DATA_FRAME_LEN] = {0};
 
-  status = HAL_I2C_Mem_Read(hi2c, dev_addr, reg_addr, I2C_MEMADD_SIZE_8BIT,
-                            raw, 2, HAL_MAX_DELAY);
-  if (status == HAL_OK) {
-    *out = ICM42670_CombineBytes(raw[0], raw[1]);
+  if ((len == 0U) || (len > ICM42670_DATA_FRAME_LEN)) {
+    return HAL_ERROR;
   }
+
+  tx[0] = reg_addr | ICM42670_SPI_READ_BIT;
+
+  ICM42670_Select();
+  status = HAL_SPI_TransmitReceive(hspi, tx, rx, (uint16_t)(len + 1U),
+                                   HAL_MAX_DELAY);
+  ICM42670_Deselect();
+
+  if (status == HAL_OK) {
+    for (uint8_t i = 0; i < len; i++) {
+      data[i] = rx[i + 1U];
+    }
+  }
+
+  return status;
+}
+
+static HAL_StatusTypeDef ICM42670_ReadRegister(SPI_HandleTypeDef *hspi,
+                                               uint8_t reg_addr,
+                                               uint8_t *value)
+{
+  return ICM42670_ReadRegisters(hspi, reg_addr, value, 1U);
+}
+
+static HAL_StatusTypeDef ICM42670_WriteRegister(SPI_HandleTypeDef *hspi,
+                                                uint8_t reg_addr,
+                                                uint8_t value)
+{
+  HAL_StatusTypeDef status;
+  uint8_t tx[2] = {reg_addr & (uint8_t)~ICM42670_SPI_READ_BIT, value};
+
+  ICM42670_Select();
+  status = HAL_SPI_Transmit(hspi, tx, 2, HAL_MAX_DELAY);
+  ICM42670_Deselect();
 
   return status;
 }
@@ -146,10 +191,10 @@ int main(void)
   MX_I2C1_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_StatusTypeDef i2c_status;
-  uint8_t who_value_i2c = 0;
-  uint8_t active_i2c_addr = ICM42670_I2C_ADDR_LOW;
+  HAL_StatusTypeDef spi_status;
+  uint8_t who_value = 0;
   uint8_t sensor_cfg_done = 0;
+  uint8_t raw_frame[ICM42670_DATA_FRAME_LEN] = {0};
   int16_t temp_raw;
   int16_t accel_x;
   int16_t accel_y;
@@ -162,99 +207,61 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-    who_value_i2c = 0;
+    who_value = 0;
 
-    HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin,
-                      GPIO_PIN_SET);
+    spi_status = ICM42670_ReadRegister(&hspi1, ICM42670_REG_WHO_AM_I,
+                                       &who_value);
 
-    i2c_status = HAL_I2C_Mem_Read(&hi2c1, ICM42670_I2C_ADDR_LOW,
-                                  ICM42670_REG_WHO_AM_I,
-                                  I2C_MEMADD_SIZE_8BIT, &who_value_i2c, 1,
-                                  HAL_MAX_DELAY);
-
-    if (i2c_status != HAL_OK) {
-      i2c_status = HAL_I2C_Mem_Read(&hi2c1, ICM42670_I2C_ADDR_HIGH,
-                                    ICM42670_REG_WHO_AM_I,
-                                    I2C_MEMADD_SIZE_8BIT, &who_value_i2c, 1,
-                                    HAL_MAX_DELAY);
-      if (i2c_status == HAL_OK) {
-        active_i2c_addr = ICM42670_I2C_ADDR_HIGH;
-      }
-    } else {
-      active_i2c_addr = ICM42670_I2C_ADDR_LOW;
-    }
-
-    if (i2c_status == HAL_OK) {
-      if (who_value_i2c == ICM42670_EXPECTED_WHO_AM_I) {
+    if (spi_status == HAL_OK) {
+      if (who_value == ICM42670_EXPECTED_WHO_AM_I) {
         if (sensor_cfg_done == 0U) {
-          uint8_t pwr_cfg = ICM42670_PWR_ACCEL_GYRO_LN;
-          HAL_StatusTypeDef cfg_status = HAL_I2C_Mem_Write(
-              &hi2c1, active_i2c_addr, ICM42670_REG_PWR_MGMT0,
-              I2C_MEMADD_SIZE_8BIT, &pwr_cfg, 1, HAL_MAX_DELAY);
+          spi_status = ICM42670_WriteRegister(&hspi1, ICM42670_REG_PWR_MGMT0,
+                                             ICM42670_PWR_ACCEL_GYRO_LN);
 
-          if (cfg_status == HAL_OK) {
+          if (spi_status == HAL_OK) {
             sensor_cfg_done = 1U;
-            printf("ICM42670 detected at 0x%02X, streaming raw values over UART\r\n",
-                   active_i2c_addr >> 1);
-            HAL_Delay(50);
+            printf("ICM42670 detected over SPI, streaming raw values over UART\r\n");
+            // HAL_Delay(1);
           } else {
-            printf("ICM42670 config write failed (status=%d)\r\n", cfg_status);
+            printf("ICM42670 SPI config write failed (status=%d)\r\n",
+                   spi_status);
+            HAL_Delay(1000);
             continue;
           }
         }
 
-        i2c_status = ICM42670_ReadInt16(&hi2c1, active_i2c_addr,
-                                        ICM42670_REG_TEMP_DATA1, &temp_raw);
-        if (i2c_status == HAL_OK) {
-          i2c_status = ICM42670_ReadInt16(&hi2c1, active_i2c_addr,
-                                          ICM42670_REG_ACCEL_DATA_X1,
-                                          &accel_x);
-        }
-        if (i2c_status == HAL_OK) {
-          i2c_status = ICM42670_ReadInt16(&hi2c1, active_i2c_addr,
-                                          ICM42670_REG_ACCEL_DATA_Y1,
-                                          &accel_y);
-        }
-        if (i2c_status == HAL_OK) {
-          i2c_status = ICM42670_ReadInt16(&hi2c1, active_i2c_addr,
-                                          ICM42670_REG_ACCEL_DATA_Z1,
-                                          &accel_z);
-        }
-        if (i2c_status == HAL_OK) {
-          i2c_status = ICM42670_ReadInt16(&hi2c1, active_i2c_addr,
-                                          ICM42670_REG_GYRO_DATA_X1,
-                                          &gyro_x);
-        }
-        if (i2c_status == HAL_OK) {
-          i2c_status = ICM42670_ReadInt16(&hi2c1, active_i2c_addr,
-                                          ICM42670_REG_GYRO_DATA_Y1,
-                                          &gyro_y);
-        }
-        if (i2c_status == HAL_OK) {
-          i2c_status = ICM42670_ReadInt16(&hi2c1, active_i2c_addr,
-                                          ICM42670_REG_GYRO_DATA_Z1,
-                                          &gyro_z);
-        }
+        spi_status = ICM42670_ReadRegisters(&hspi1, ICM42670_REG_TEMP_DATA1,
+                                            raw_frame,
+                                            ICM42670_DATA_FRAME_LEN);
 
-        if (i2c_status == HAL_OK) {
+        if (spi_status == HAL_OK) {
+          temp_raw = ICM42670_CombineBytes(raw_frame[0], raw_frame[1]);
+          accel_x = ICM42670_CombineBytes(raw_frame[2], raw_frame[3]);
+          accel_y = ICM42670_CombineBytes(raw_frame[4], raw_frame[5]);
+          accel_z = ICM42670_CombineBytes(raw_frame[6], raw_frame[7]);
+          gyro_x = ICM42670_CombineBytes(raw_frame[8], raw_frame[9]);
+          gyro_y = ICM42670_CombineBytes(raw_frame[10], raw_frame[11]);
+          gyro_z = ICM42670_CombineBytes(raw_frame[12], raw_frame[13]);
+
           printf("WHO=0x%02X T=%d AX=%d AY=%d AZ=%d GX=%d GY=%d GZ=%d\r\n",
-                 who_value_i2c, temp_raw, accel_x, accel_y, accel_z, gyro_x,
+                 who_value, temp_raw, accel_x, accel_y, accel_z, gyro_x,
                  gyro_y, gyro_z);
         } else {
-          printf("I2C frame read failed (status=%d)\r\n", i2c_status);
+          printf("SPI frame read failed (status=%d)\r\n", spi_status);
+          HAL_Delay(1000);
         }
       } else {
-        printf("Unexpected WHO_AM_I: 0x%02X\r\n", who_value_i2c);
+        printf("Unexpected SPI WHO_AM_I: 0x%02X\r\n", who_value);
+        HAL_Delay(1000);
       }
     } else {
-      printf("I2C WHO_AM_I read failed on 0x68 and 0x69 (status=%d)\r\n",
-             i2c_status);
+      printf("SPI WHO_AM_I read failed (status=%d)\r\n", spi_status);
     }
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    /* Continuous SPI traffic for logic analyzer capture. */
+    // HAL_Delay(1);
   }
   /* USER CODE END 3 */
 }
@@ -421,7 +428,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -468,7 +475,7 @@ static void MX_USART3_UART_Init(void)
   huart3.Init.Parity = UART_PARITY_NONE;
   huart3.Init.Mode = UART_MODE_TX_RX;
   huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_8;
   huart3.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
   huart3.Init.ClockPrescaler = UART_PRESCALER_DIV1;
   huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
