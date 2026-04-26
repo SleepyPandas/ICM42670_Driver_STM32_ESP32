@@ -70,14 +70,8 @@ ICM42670_Status_t ICM42670_ReadAccelRaw(const ICM42670_Config *config,
 ICM42670_Status_t ICM42670_ReadGyroRaw(const ICM42670_Config *config,
                                        int16_t gyro_raw[6]);
 
-ICM42670_Status_t ICM42670_ReadTempRaw(const ICM42670_Config *config,
-                                       int16_t *temp_raw);
-
 ICM42670_Status_t ICM42670_ReadAccelG(const ICM42670_Config *config,
                                       ICM42670_Accel_t *accel);
 
 ICM42670_Status_t ICM42670_ReadGyroDps(const ICM42670_Config *config,
                                        ICM42670_Gyro_t *gyro);
-
-ICM42670_Status_t ICM42670_ReadTempC(const ICM42670_Config *config,
-                                     float *temp_c);
