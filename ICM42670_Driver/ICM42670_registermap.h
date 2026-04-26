@@ -120,30 +120,6 @@ extern "C" {
 #define ICM42670_PWR_ACCEL_GYRO_LN                                             \
   (ICM42670_PWR_GYRO_LN | ICM42670_PWR_ACCEL_LN)
 
-/* GYRO_CONFIG0 full-scale field values. */
-#define ICM42670_GYRO_FS_2000_DPS 0x00U
-#define ICM42670_GYRO_FS_1000_DPS 0x20U
-#define ICM42670_GYRO_FS_500_DPS 0x40U
-#define ICM42670_GYRO_FS_250_DPS 0x60U
-
-/* ACCEL_CONFIG0 full-scale field values. */
-#define ICM42670_ACCEL_FS_16G 0x00U
-#define ICM42670_ACCEL_FS_8G 0x20U
-#define ICM42670_ACCEL_FS_4G 0x40U
-#define ICM42670_ACCEL_FS_2G 0x60U
-
-/* Shared UI ODR field values for gyro and accel config registers. */
-#define ICM42670_ODR_1600_HZ 0x05U
-#define ICM42670_ODR_800_HZ 0x06U
-#define ICM42670_ODR_400_HZ 0x07U
-#define ICM42670_ODR_200_HZ 0x08U
-#define ICM42670_ODR_100_HZ 0x09U
-#define ICM42670_ODR_50_HZ 0x0AU
-#define ICM42670_ODR_25_HZ 0x0BU
-#define ICM42670_ODR_12_5_HZ 0x0CU
-#define ICM42670_ACCEL_ODR_6_25_HZ 0x0DU
-#define ICM42670_ACCEL_ODR_3_125_HZ 0x0EU
-#define ICM42670_ACCEL_ODR_1_5625_HZ 0x0FU
 
 /* Common config bytes. */
 #define ICM42670_GYRO_CONFIG0_2000DPS_100HZ                                    \
