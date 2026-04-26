@@ -379,15 +379,10 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-#personal notes
-PersonalNotes.md
-ST7789V3_Driver/fonts/gen_fonts.py
-implementation_plan.md
-portfolio_strategy.md
-MiscMySTuff.md
-MiscMySTuff2.md
-
+#Other
 *.txt
 .txt
 gdbClient_log.txt
 stlinkgdbserver_log.txt
+.github/
+.cursor/
