@@ -75,16 +75,16 @@ typedef struct {
 
   void *handle; // User-defined handle for read/write/delay functions (e.g., I2C
                 // or SPI handle / BUS type)
-  int8_t (*read_reg)(void *handle, uint8_t reg_addr, const uint8_t *data,
+  int8_t (*read_reg)(void *handle, uint8_t reg_addr, uint8_t *data,
                      uint16_t len);
 
-  int8_t (*write_reg)(void *handle, uint8_t reg_addr, uint8_t *data,
+  int8_t (*write_reg)(void *handle, uint8_t reg_addr, const uint8_t *data,
                       uint16_t len);
   void (*delay_ms)(uint32_t ms);
 
 } ICM42670_Config;
 
-ICM42670_Status_t ICM42670_Init(const ICM42670_Config *config);
+ICM42670_Status_t ICM42670_Init(ICM42670_Config *config);
 
 ICM42670_Status_t ICM42670_ReadAccelRaw(const ICM42670_Config *config,
                                         int16_t accel_raw[3]);
