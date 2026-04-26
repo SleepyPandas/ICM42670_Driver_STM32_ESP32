@@ -1,23 +1,14 @@
 /**
- * @file ST7789V3.h
- * @brief Public API for the ST7789V3 SPI display driver.
+ * @file ICM42670_registermap.h
+ * @brief Basic ICM-42670-P register addresses and field values.
  *
- * This module provides a small, platform-agnostic interface for controlling an
- * ST7789V3-based display over SPI. The application supplies the hardware
- * access callbacks in ::ST7789V3_Config, then uses the driver to initialize
- * the display, configure core display settings, draw graphics primitives, and
- * optionally stream pixel buffers with DMA.
+ * Register addresses are from the ICM-42670-P datasheet, user bank 0. 
+ * @note not all added registers / values are used.
  *
- * Typical responsibilities handled by this header include:
- * - Display initialization and reset flow
- * - Display mode control such as sleep, inversion, and rotation
- * - Drawing text, pixels, lines, rectangles, and circles
- * - Optional non-blocking DMA pixel transfers with completion callbacks
  */
 
-#ifndef ICM42670_registermap_H
-#define ICM42670_registermap_H
-
+#ifndef ICM42670_REGISTERMAP_H
+#define ICM42670_REGISTERMAP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,23 +16,155 @@ extern "C" {
 
 #include <stdint.h>
 
+/* Device identity. */
+#define ICM42670_REG_WHO_AM_I 0x75U
+#define ICM42670_WHO_AM_I_VALUE 0x67U
 
+/* User bank 0: basic status and control. */
+#define ICM42670_REG_MCLK_RDY 0x00U
+#define ICM42670_REG_DEVICE_CONFIG 0x01U
+#define ICM42670_REG_SIGNAL_PATH_RESET 0x02U
+#define ICM42670_REG_DRIVE_CONFIG1 0x03U
+#define ICM42670_REG_DRIVE_CONFIG2 0x04U
+#define ICM42670_REG_DRIVE_CONFIG3 0x05U
+#define ICM42670_REG_INT_CONFIG 0x06U
 
+/**  User bank 0: sensor output registers.
+ * @note
+ * The data registers are provided in pairs of high and low bytes, and the *
+ * sensor outputs are 16-bit signed values. For example, the gyro X-axis *
+ * output is represented by GYRO_DATA_X1 (high byte) and GYRO_DATA_X0 (low
+ * byte).
+ */
 
+#define ICM42670_REG_TEMP_DATA0 0x0AU
+#define ICM42670_REG_ACCEL_DATA_X1 0x0BU
+#define ICM42670_REG_ACCEL_DATA_X0 0x0CU
+#define ICM42670_REG_ACCEL_DATA_Y1 0x0DU
+#define ICM42670_REG_ACCEL_DATA_Y0 0x0EU
+#define ICM42670_REG_ACCEL_DATA_Z1 0x0FU
+#define ICM42670_REG_ACCEL_DATA_Z0 0x10U
+#define ICM42670_REG_GYRO_DATA_X1 0x11U
+#define ICM42670_REG_GYRO_DATA_X0 0x12U
+#define ICM42670_REG_GYRO_DATA_Y1 0x13U
+#define ICM42670_REG_GYRO_DATA_Y0 0x14U
+#define ICM42670_REG_GYRO_DATA_Z1 0x15U
+#define ICM42670_REG_GYRO_DATA_Z0 0x16U
+#define ICM42670_REG_TMST_FSYNCH 0x17U
+#define ICM42670_REG_TMST_FSYNCL 0x18U
 
+/* User bank 0: power, scale, ODR, and filter configuration. */
+#define ICM42670_REG_PWR_MGMT0 0x1FU
+#define ICM42670_REG_GYRO_CONFIG0 0x20U
+#define ICM42670_REG_ACCEL_CONFIG0 0x21U
+#define ICM42670_REG_TEMP_CONFIG0 0x22U
+#define ICM42670_REG_GYRO_CONFIG1 0x23U
+#define ICM42670_REG_ACCEL_CONFIG1 0x24U
 
+/* User bank 0: APEX/WOM/FIFO/interrupt basics. */
+#define ICM42670_REG_APEX_CONFIG0 0x25U
+#define ICM42670_REG_APEX_CONFIG1 0x26U
+#define ICM42670_REG_WOM_CONFIG 0x27U
+#define ICM42670_REG_FIFO_CONFIG1 0x28U
+#define ICM42670_REG_FIFO_CONFIG2 0x29U
+#define ICM42670_REG_FIFO_CONFIG3 0x2AU
+#define ICM42670_REG_INT_SOURCE0 0x2BU
+#define ICM42670_REG_INT_SOURCE1 0x2CU
+#define ICM42670_REG_INT_SOURCE3 0x2DU
+#define ICM42670_REG_INT_SOURCE4 0x2EU
+#define ICM42670_REG_INTF_CONFIG0 0x35U
+#define ICM42670_REG_INTF_CONFIG1 0x36U
+#define ICM42670_REG_INT_STATUS_DRDY 0x39U
+#define ICM42670_REG_INT_STATUS 0x3AU
+#define ICM42670_REG_INT_STATUS2 0x3BU
+#define ICM42670_REG_INT_STATUS3 0x3CU
+#define ICM42670_REG_FIFO_COUNTH 0x3DU
+#define ICM42670_REG_FIFO_COUNTL 0x3EU
+#define ICM42670_REG_FIFO_DATA 0x3FU
 
+/* User bank 0: indirect MREG access window. */
+#define ICM42670_REG_BLK_SEL_W 0x79U
+#define ICM42670_REG_MADDR_W 0x7AU
+#define ICM42670_REG_M_W 0x7BU
+#define ICM42670_REG_BLK_SEL_R 0x7CU
+#define ICM42670_REG_MADDR_R 0x7DU
+#define ICM42670_REG_M_R 0x7EU
 
+/* Useful contiguous burst lengths. */
+#define ICM42670_TEMP_DATA_LEN 2U
+#define ICM42670_ACCEL_DATA_LEN 6U
+#define ICM42670_GYRO_DATA_LEN 6U
+#define ICM42670_ACCEL_GYRO_TEMP_LEN 14U
 
+/* MCLK_RDY bits. */
+#define ICM42670_MCLK_RDY_MASK 0x08U
 
+/* DEVICE_CONFIG bits. */
+#define ICM42670_DEVICE_CONFIG_SOFT_RESET 0x01U
+#define ICM42670_DEVICE_CONFIG_SPI_MODE_0 0x00U
+#define ICM42670_DEVICE_CONFIG_SPI_MODE_3 0x10U
 
+/* SIGNAL_PATH_RESET bits. */
+#define ICM42670_SIGNAL_PATH_FIFO_FLUSH 0x04U
 
+/* PWR_MGMT0 field values. */
+#define ICM42670_PWR_ACCEL_LP_CLK_WUOSC 0x00U
+#define ICM42670_PWR_ACCEL_LP_CLK_RC 0x80U
+#define ICM42670_PWR_IDLE 0x10U
+#define ICM42670_PWR_GYRO_OFF 0x00U
+#define ICM42670_PWR_GYRO_STANDBY 0x04U
+#define ICM42670_PWR_GYRO_LN 0x0CU
+#define ICM42670_PWR_ACCEL_OFF 0x00U
+#define ICM42670_PWR_ACCEL_LP 0x02U
+#define ICM42670_PWR_ACCEL_LN 0x03U
+#define ICM42670_PWR_ACCEL_GYRO_LN                                             \
+  (ICM42670_PWR_GYRO_LN | ICM42670_PWR_ACCEL_LN)
 
+/* GYRO_CONFIG0 full-scale field values. */
+#define ICM42670_GYRO_FS_2000_DPS 0x00U
+#define ICM42670_GYRO_FS_1000_DPS 0x20U
+#define ICM42670_GYRO_FS_500_DPS 0x40U
+#define ICM42670_GYRO_FS_250_DPS 0x60U
+
+/* ACCEL_CONFIG0 full-scale field values. */
+#define ICM42670_ACCEL_FS_16G 0x00U
+#define ICM42670_ACCEL_FS_8G 0x20U
+#define ICM42670_ACCEL_FS_4G 0x40U
+#define ICM42670_ACCEL_FS_2G 0x60U
+
+/* Shared UI ODR field values for gyro and accel config registers. */
+#define ICM42670_ODR_1600_HZ 0x05U
+#define ICM42670_ODR_800_HZ 0x06U
+#define ICM42670_ODR_400_HZ 0x07U
+#define ICM42670_ODR_200_HZ 0x08U
+#define ICM42670_ODR_100_HZ 0x09U
+#define ICM42670_ODR_50_HZ 0x0AU
+#define ICM42670_ODR_25_HZ 0x0BU
+#define ICM42670_ODR_12_5_HZ 0x0CU
+#define ICM42670_ACCEL_ODR_6_25_HZ 0x0DU
+#define ICM42670_ACCEL_ODR_3_125_HZ 0x0EU
+#define ICM42670_ACCEL_ODR_1_5625_HZ 0x0FU
+
+/* Common config bytes. */
+#define ICM42670_GYRO_CONFIG0_2000DPS_100HZ                                    \
+  (ICM42670_GYRO_FS_2000_DPS | ICM42670_ODR_100_HZ)
+#define ICM42670_ACCEL_CONFIG0_16G_100HZ                                       \
+  (ICM42670_ACCEL_FS_16G | ICM42670_ODR_100_HZ)
+
+/* INT_STATUS_DRDY bits. */
+#define ICM42670_INT_STATUS_DRDY_DATA_RDY 0x01U
+
+/* INT_STATUS bits. */
+#define ICM42670_INT_STATUS_ST 0x80U
+#define ICM42670_INT_STATUS_FSYNC 0x40U
+#define ICM42670_INT_STATUS_PLL_RDY 0x20U
+#define ICM42670_INT_STATUS_RESET_DONE 0x10U
+#define ICM42670_INT_STATUS_FIFO_THS 0x04U
+#define ICM42670_INT_STATUS_FIFO_FULL 0x02U
+#define ICM42670_INT_STATUS_AGC_RDY 0x01U
 
 #ifdef __cplusplus
 }
 #endif
 
-
-
-#endif /* __ICM42670_registermap_H */
+#endif /* ICM42670_REGISTERMAP_H */
