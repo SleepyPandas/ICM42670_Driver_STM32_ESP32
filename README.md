@@ -7,3 +7,4 @@ After there should be more complex configurations if you need them for example: 
 
 
 [DataSheet STM32](https://www.st.com/resource/en/user_manual/um3121-stm32h5-nucleo64-board-mb1814-stmicroelectronics.pdf)
+[DataSheet ICM42670] (https://d17t6iyxenbwp1.cloudfront.net/s3fs-public/2026-02/ds-000451_icm-42670-p-datasheet_0.pdf?VersionId=IZnZlzqvpHU7XfSMavsmHv4yFZkfwwyd)
