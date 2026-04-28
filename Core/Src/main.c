@@ -18,10 +18,13 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "stm32h5xx_hal_uart.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include "ICM42670_driver.h"
+#include "ports/stm32_hal/ICM42670_stm32_hal.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,21 +35,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define ICM42670_REG_WHO_AM_I 0x75U
 #define ICM42670_SPI_CS_GPIO_Port CS_SPI_GPIO_Port
 #define ICM42670_SPI_CS_Pin CS_SPI_Pin
-#define ICM42670_SPI_READ_BIT 0x80U
-#define ICM42670_EXPECTED_WHO_AM_I 0x67U
-#define ICM42670_REG_TEMP_DATA1 0x09U
-#define ICM42670_REG_ACCEL_DATA_X1 0x0BU
-#define ICM42670_REG_ACCEL_DATA_Y1 0x0DU
-#define ICM42670_REG_ACCEL_DATA_Z1 0x0FU
-#define ICM42670_REG_GYRO_DATA_X1 0x11U
-#define ICM42670_REG_GYRO_DATA_Y1 0x13U
-#define ICM42670_REG_GYRO_DATA_Z1 0x15U
-#define ICM42670_REG_PWR_MGMT0 0x1FU
-#define ICM42670_PWR_ACCEL_GYRO_LN 0x0FU
-#define ICM42670_DATA_FRAME_LEN 14U
 
 /* USER CODE END PD */
 
@@ -75,84 +65,60 @@ static void MX_SPI1_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
+static void UART_SendLine(const char *line);
+static void UART_SendRawSample(const int16_t accel_raw[3],
+                               const int16_t gyro_raw[3]);
+static void UART_SendWhoAmI(uint8_t who_am_i);
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-static int16_t ICM42670_CombineBytes(uint8_t msb, uint8_t lsb)
+static void UART_SendLine(const char *line)
 {
-  return (int16_t)(((uint16_t)msb << 8U) | (uint16_t)lsb);
-}
+  size_t len = 0U;
 
-static void ICM42670_Select(void)
-{
-  HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin,
-                    GPIO_PIN_RESET);
-}
-
-static void ICM42670_Deselect(void)
-{
-  HAL_GPIO_WritePin(ICM42670_SPI_CS_GPIO_Port, ICM42670_SPI_CS_Pin,
-                    GPIO_PIN_SET);
-}
-
-static HAL_StatusTypeDef ICM42670_ReadRegisters(SPI_HandleTypeDef *hspi,
-                                                uint8_t reg_addr,
-                                                uint8_t *data,
-                                                uint8_t len)
-{
-  HAL_StatusTypeDef status;
-  uint8_t tx[1U + ICM42670_DATA_FRAME_LEN] = {0};
-  uint8_t rx[1U + ICM42670_DATA_FRAME_LEN] = {0};
-
-  if ((len == 0U) || (len > ICM42670_DATA_FRAME_LEN)) {
-    return HAL_ERROR;
+  if (line == NULL) {
+    return;
   }
 
-  tx[0] = reg_addr | ICM42670_SPI_READ_BIT;
+  while (line[len] != '\0') {
+    len++;
+  }
 
-  ICM42670_Select();
-  status = HAL_SPI_TransmitReceive(hspi, tx, rx, (uint16_t)(len + 1U),
-                                   HAL_MAX_DELAY);
-  ICM42670_Deselect();
+  (void)HAL_UART_Transmit(&huart3, (uint8_t *)line, (uint16_t)len,
+                          HAL_MAX_DELAY);
+}
 
-  if (status == HAL_OK) {
-    for (uint8_t i = 0; i < len; i++) {
-      data[i] = rx[i + 1U];
+static void UART_SendRawSample(const int16_t accel_raw[3],
+                               const int16_t gyro_raw[3])
+{
+  char line[128];
+  int len = snprintf(line, sizeof(line),
+                     "ACC raw: X=%d Y=%d Z=%d | GYR raw: X=%d Y=%d Z=%d\r\n",
+                     accel_raw[0], accel_raw[1], accel_raw[2], gyro_raw[0],
+                     gyro_raw[1], gyro_raw[2]);
+
+  if (len > 0) {
+    if ((size_t)len >= sizeof(line)) {
+      len = (int)sizeof(line) - 1;
     }
+
+    (void)HAL_UART_Transmit(&huart3, (uint8_t *)line, (uint16_t)len,
+                            HAL_MAX_DELAY);
   }
-
-  return status;
 }
 
-static HAL_StatusTypeDef ICM42670_ReadRegister(SPI_HandleTypeDef *hspi,
-                                               uint8_t reg_addr,
-                                               uint8_t *value)
+static void UART_SendWhoAmI(uint8_t who_am_i)
 {
-  return ICM42670_ReadRegisters(hspi, reg_addr, value, 1U);
-}
+  char line[32];
+  int len = snprintf(line, sizeof(line), "WHO_AM_I=0x%02X\r\n", who_am_i);
 
-static HAL_StatusTypeDef ICM42670_WriteRegister(SPI_HandleTypeDef *hspi,
-                                                uint8_t reg_addr,
-                                                uint8_t value)
-{
-  HAL_StatusTypeDef status;
-  uint8_t tx[2] = {reg_addr & (uint8_t)~ICM42670_SPI_READ_BIT, value};
-
-  ICM42670_Select();
-  status = HAL_SPI_Transmit(hspi, tx, 2, HAL_MAX_DELAY);
-  ICM42670_Deselect();
-
-  return status;
-}
-
-int __io_putchar(int ch)
-{
-  uint8_t c = (uint8_t)ch;
-  (void)HAL_UART_Transmit(&huart3, &c, 1, HAL_MAX_DELAY);
-  return ch;
+  if (len > 0) {
+    (void)HAL_UART_Transmit(&huart3, (uint8_t *)line, (uint16_t)len,
+                            HAL_MAX_DELAY);
+  }
 }
 
 /* USER CODE END 0 */
@@ -191,77 +157,61 @@ int main(void)
   MX_I2C1_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_StatusTypeDef spi_status;
-  uint8_t who_value = 0;
-  uint8_t sensor_cfg_done = 0;
-  uint8_t raw_frame[ICM42670_DATA_FRAME_LEN] = {0};
-  int16_t temp_raw;
-  int16_t accel_x;
-  int16_t accel_y;
-  int16_t accel_z;
-  int16_t gyro_x;
-  int16_t gyro_y;
-  int16_t gyro_z;
+  ICM42670_STM32_SPIBus imu_spi_bus = {0};
+  ICM42670_Config imu_config = {
+      .accel_odr = 0,
+      .accel_fs = 0,
+      .gyro_odr = 0,
+      .gyro_fs = 0,
+  };
+  int16_t accel_raw[3] = {0};
+  int16_t gyro_raw[3] = {0};
+  uint8_t who_am_i = 0U;
+  uint8_t imu_ready = 0U;
+
+  if (ICM42670_STM32_SPI_INIT(&imu_config, &imu_spi_bus, &hspi1,
+                              ICM42670_SPI_CS_GPIO_Port,
+                              ICM42670_SPI_CS_Pin) != ICM42670_OK) {
+    UART_SendLine("ICM42670 STM32 SPI setup failed\r\n");
+  } else {
+    HAL_Delay(10);
+
+    if (imu_config.read_reg(imu_config.handle, ICM42670_REG_WHO_AM_I,
+                            &who_am_i, 1U) == ICM42670_OK) {
+      UART_SendWhoAmI(who_am_i);
+    } else {
+      UART_SendLine("WHO_AM_I read transaction failed\r\n");
+    }
+
+    if (ICM42670_Init(&imu_config) == ICM42670_OK) {
+      imu_ready = 1U;
+      UART_SendLine("ICM42670 init OK\r\n");
+    } else {
+      UART_SendLine("ICM42670 init failed\r\n");
+    }
+  }
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-    who_value = 0;
-
-    spi_status = ICM42670_ReadRegister(&hspi1, ICM42670_REG_WHO_AM_I,
-                                       &who_value);
-
-    if (spi_status == HAL_OK) {
-      if (who_value == ICM42670_EXPECTED_WHO_AM_I) {
-        if (sensor_cfg_done == 0U) {
-          spi_status = ICM42670_WriteRegister(&hspi1, ICM42670_REG_PWR_MGMT0,
-                                             ICM42670_PWR_ACCEL_GYRO_LN);
-
-          if (spi_status == HAL_OK) {
-            sensor_cfg_done = 1U;
-            printf("ICM42670 detected over SPI, streaming raw values over UART\r\n");
-            // HAL_Delay(1);
-          } else {
-            printf("ICM42670 SPI config write failed (status=%d)\r\n",
-                   spi_status);
-            HAL_Delay(1000);
-            continue;
-          }
-        }
-
-        spi_status = ICM42670_ReadRegisters(&hspi1, ICM42670_REG_TEMP_DATA1,
-                                            raw_frame,
-                                            ICM42670_DATA_FRAME_LEN);
-
-        if (spi_status == HAL_OK) {
-          temp_raw = ICM42670_CombineBytes(raw_frame[0], raw_frame[1]);
-          accel_x = ICM42670_CombineBytes(raw_frame[2], raw_frame[3]);
-          accel_y = ICM42670_CombineBytes(raw_frame[4], raw_frame[5]);
-          accel_z = ICM42670_CombineBytes(raw_frame[6], raw_frame[7]);
-          gyro_x = ICM42670_CombineBytes(raw_frame[8], raw_frame[9]);
-          gyro_y = ICM42670_CombineBytes(raw_frame[10], raw_frame[11]);
-          gyro_z = ICM42670_CombineBytes(raw_frame[12], raw_frame[13]);
-
-          printf("WHO=0x%02X T=%d AX=%d AY=%d AZ=%d GX=%d GY=%d GZ=%d\r\n",
-                 who_value, temp_raw, accel_x, accel_y, accel_z, gyro_x,
-                 gyro_y, gyro_z);
-        } else {
-          printf("SPI frame read failed (status=%d)\r\n", spi_status);
-          HAL_Delay(1000);
-        }
+    if (imu_ready != 0U) {
+      if ((ICM42670_ReadAccelRaw(&imu_config, accel_raw) == ICM42670_OK) &&
+          (ICM42670_ReadGyroRaw(&imu_config, gyro_raw) == ICM42670_OK)) {
+        UART_SendRawSample(accel_raw, gyro_raw);
       } else {
-        printf("Unexpected SPI WHO_AM_I: 0x%02X\r\n", who_value);
-        HAL_Delay(1000);
+        UART_SendLine("ICM42670 raw read failed\r\n");
       }
-    } else {
-      printf("SPI WHO_AM_I read failed (status=%d)\r\n", spi_status);
     }
+
+    HAL_Delay(1);
 
     /* USER CODE END WHILE */
 
+
     /* USER CODE BEGIN 3 */
-    // HAL_Delay(1);
+
   }
   /* USER CODE END 3 */
 }
