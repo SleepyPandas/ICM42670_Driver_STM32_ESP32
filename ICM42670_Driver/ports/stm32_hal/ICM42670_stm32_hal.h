@@ -20,7 +20,8 @@ typedef struct {
   uint32_t timeout_ms;
 } ICM42670_STM32_SPIBus;
 
-ICM42670_Status_t ICM42670_STM32_SPI_Setup(
+
+ICM42670_Status_t ICM42670_STM32_SPI_INIT(
     ICM42670_Config *config, ICM42670_STM32_SPIBus *bus,
     SPI_HandleTypeDef *hspi, GPIO_TypeDef *cs_port, uint16_t cs_pin);
 
@@ -29,6 +30,30 @@ int8_t ICM42670_STM32_SPI_ReadReg(void *handle, uint8_t reg_addr,
 
 int8_t ICM42670_STM32_SPI_WriteReg(void *handle, uint8_t reg_addr,
                                    const uint8_t *data, uint16_t len);
+
+
+typedef struct {
+  // need SCLK and SDA which is in hi2c
+  I2C_HandleTypeDef *hi2c;
+  uint32_t timeout_ms;
+} ICM42670_STM32_I2CBus;
+
+
+ICM42670_Status_t ICM42670_STM32_I2C_INIT(
+    ICM42670_Config *config, ICM42670_STM32_I2CBus *bus,
+    I2C_HandleTypeDef *hi2c);
+
+int8_t ICM42670_STM32_I2C_ReadReg(void *handle, uint8_t reg_addr,
+                                  uint8_t *data, uint16_t len);
+
+int8_t ICM42670_STM32_I2C_WriteReg(void *handle, uint8_t reg_addr,
+                                    const uint8_t *data, uint16_t len);
+
+
+
+
+
+
 
 #ifdef __cplusplus
 }
