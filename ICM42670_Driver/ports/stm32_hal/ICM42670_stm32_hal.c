@@ -22,7 +22,7 @@ static void ICM42670_STM32_SPI_Deselect(const ICM42670_STM32_SPIBus *bus) {
   HAL_GPIO_WritePin(bus->cs_port, bus->cs_pin, GPIO_PIN_SET);
 }
 
-ICM42670_Status_t ICM42670_STM32_SPI_Setup(
+ICM42670_Status_t ICM42670_STM32_SPI_INIT(
     ICM42670_Config *config, ICM42670_STM32_SPIBus *bus,
     SPI_HandleTypeDef *hspi, GPIO_TypeDef *cs_port, uint16_t cs_pin) {
   if ((config == NULL) || (bus == NULL) || (hspi == NULL) ||
