@@ -33,21 +33,22 @@ int8_t ICM42670_STM32_SPI_WriteReg(void *handle, uint8_t reg_addr,
                                    const uint8_t *data, uint16_t len);
 
 typedef struct {
-  // need SCLK and SDA which is in hi2c
   I2C_HandleTypeDef *hi2c;
+  // 7-bit I2C address, for example 0x68 or 0x69.
+  uint8_t device_addr;
   uint32_t timeout_ms;
 } ICM42670_STM32_I2CBus;
 
 ICM42670_Status_t ICM42670_STM32_I2C_INIT(ICM42670_Config *config,
                                           ICM42670_STM32_I2CBus *bus,
-                                          I2C_HandleTypeDef *hi2c);
+                                          I2C_HandleTypeDef *hi2c,
+                                          uint8_t device_addr);
 
 int8_t ICM42670_STM32_I2C_ReadReg(void *handle, uint8_t reg_addr, uint8_t *data,
-                                  uint16_t len, uint8_t device_addr);
+                                  uint16_t len);
 
 int8_t ICM42670_STM32_I2C_WriteReg(void *handle, uint8_t reg_addr,
-                                   const uint8_t *data, uint16_t len,
-                                   uint8_t device_addr);
+                                   const uint8_t *data, uint16_t len);
 
 #ifdef __cplusplus
 }
