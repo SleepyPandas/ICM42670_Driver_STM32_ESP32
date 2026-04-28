@@ -43,7 +43,7 @@ ICM42670_Status_t ICM42670_STM32_I2C_INIT(ICM42670_Config *config,
                                           I2C_HandleTypeDef *hi2c);
 
 int8_t ICM42670_STM32_I2C_ReadReg(void *handle, uint8_t reg_addr, uint8_t *data,
-                                  uint16_t len);
+                                  uint16_t len, uint8_t device_addr);
 
 int8_t ICM42670_STM32_I2C_WriteReg(void *handle, uint8_t reg_addr,
                                    const uint8_t *data, uint16_t len,
