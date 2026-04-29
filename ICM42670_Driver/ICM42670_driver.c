@@ -279,7 +279,7 @@ ICM42670_Status_t ICM42670_Gyro_Calibration(ICM42670_Config *config) {
   int16_t gyro_raw[3] = {0};
 
   // Collect multiple samples and average to find bias
-  const int num_samples = 100;
+  const int num_samples = 200;
 
   for (int i = 0; i < num_samples; i++) {
     if (ICM42670_ReadGyroRaw(config, gyro_raw) != ICM42670_OK) {
