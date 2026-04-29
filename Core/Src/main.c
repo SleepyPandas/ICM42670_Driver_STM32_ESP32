@@ -67,9 +67,9 @@ static void MX_I2C1_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
 static void UART_SendLine(const char *line);
-static void UART_SendRawSample(const int16_t accel_raw[3],
-                               const int16_t gyro_raw[3], int16_t temp_raw,
-                               float temp_c);
+static void UART_SendScaledSample(const ICM42670_Accel_t *accel,
+                                  const ICM42670_Gyro_t *gyro,
+                                  int16_t temp_raw, float temp_c);
 static void UART_SendWhoAmI(uint8_t who_am_i);
 
 /* USER CODE END PFP */
@@ -92,25 +92,70 @@ static void UART_SendLine(const char *line) {
                           HAL_MAX_DELAY);
 }
 
-static void UART_SendRawSample(const int16_t accel_raw[3],
-                               const int16_t gyro_raw[3], int16_t temp_raw,
-                               float temp_c) {
-  char line[128];
-  int32_t temp_centi = (int32_t)((temp_c >= 0.0f) ? (temp_c * 100.0f + 0.5f)
-                                                 : (temp_c * 100.0f - 0.5f));
+static int32_t FloatToScaledInt(float value, float scale) {
+  return (int32_t)((value >= 0.0f) ? (value * scale + 0.5f)
+                                  : (value * scale - 0.5f));
+}
+
+static int32_t AbsInt32(int32_t value) {
+  return (value < 0) ? -value : value;
+}
+
+static char ScaledSign(int32_t value) { return (value < 0) ? '-' : '+'; }
+
+static void UART_SendScaledSample(const ICM42670_Accel_t *accel,
+                                  const ICM42670_Gyro_t *gyro,
+                                  int16_t temp_raw, float temp_c) {
+  char line[160];
+  int32_t accel_x_milli_g = 0;
+  int32_t accel_y_milli_g = 0;
+  int32_t accel_z_milli_g = 0;
+  int32_t gyro_x_milli_dps = 0;
+  int32_t gyro_y_milli_dps = 0;
+  int32_t gyro_z_milli_dps = 0;
+  int32_t temp_centi = FloatToScaledInt(temp_c, 100.0f);
   int32_t temp_whole = temp_centi / 100;
   int32_t temp_frac = temp_centi % 100;
+
+  if ((accel == NULL) || (gyro == NULL)) {
+    return;
+  }
+
+  accel_x_milli_g = FloatToScaledInt(accel->x_g, 1000.0f);
+  accel_y_milli_g = FloatToScaledInt(accel->y_g, 1000.0f);
+  accel_z_milli_g = FloatToScaledInt(accel->z_g, 1000.0f);
+  gyro_x_milli_dps = FloatToScaledInt(gyro->x_dps, 1000.0f);
+  gyro_y_milli_dps = FloatToScaledInt(gyro->y_dps, 1000.0f);
+  gyro_z_milli_dps = FloatToScaledInt(gyro->z_dps, 1000.0f);
 
   if (temp_frac < 0) {
     temp_frac = -temp_frac;
   }
 
   int len = snprintf(line, sizeof(line),
-                     "ACC raw: X=%d Y=%d Z=%d | GYR raw: X=%d Y=%d Z=%d | "
+                     "ACC: X=%c%ld.%03ldg Y=%c%ld.%03ldg Z=%c%ld.%03ldg | "
+                     "GYR: X=%c%ld.%03lddps Y=%c%ld.%03lddps "
+                     "Z=%c%ld.%03lddps | "
                      "TEMP raw: %d TEMP=%ld.%02ld C\r\n",
-                     accel_raw[0], accel_raw[1], accel_raw[2], gyro_raw[0],
-                     gyro_raw[1], gyro_raw[2], temp_raw, (long)temp_whole,
-                     (long)temp_frac);
+                     ScaledSign(accel_x_milli_g),
+                     (long)(AbsInt32(accel_x_milli_g) / 1000),
+                     (long)(AbsInt32(accel_x_milli_g) % 1000),
+                     ScaledSign(accel_y_milli_g),
+                     (long)(AbsInt32(accel_y_milli_g) / 1000),
+                     (long)(AbsInt32(accel_y_milli_g) % 1000),
+                     ScaledSign(accel_z_milli_g),
+                     (long)(AbsInt32(accel_z_milli_g) / 1000),
+                     (long)(AbsInt32(accel_z_milli_g) % 1000),
+                     ScaledSign(gyro_x_milli_dps),
+                     (long)(AbsInt32(gyro_x_milli_dps) / 1000),
+                     (long)(AbsInt32(gyro_x_milli_dps) % 1000),
+                     ScaledSign(gyro_y_milli_dps),
+                     (long)(AbsInt32(gyro_y_milli_dps) / 1000),
+                     (long)(AbsInt32(gyro_y_milli_dps) % 1000),
+                     ScaledSign(gyro_z_milli_dps),
+                     (long)(AbsInt32(gyro_z_milli_dps) / 1000),
+                     (long)(AbsInt32(gyro_z_milli_dps) % 1000), temp_raw,
+                     (long)temp_whole, (long)temp_frac);
 
   if (len > 0) {
     if ((size_t)len >= sizeof(line)) {
@@ -170,13 +215,11 @@ int main(void) {
   /* USER CODE BEGIN 2 */
   ICM42670_STM32_SPIBus imu_spi_bus = {0};
   ICM42670_Config imu_config = {
-      .accel_odr = 0,
-      .accel_fs = 0,
-      .gyro_odr = 0,
-      .gyro_fs = 0,
+      // .accel_odr = 0,
+      .accel_fs = ICM42670_ACCEL_FS_4G,
+      // .gyro_odr = 0,
+      .gyro_fs = ICM42670_GYRO_FS_500_DPS,
   };
-  int16_t accel_raw[3] = {0};
-  int16_t gyro_raw[3] = {0};
   int16_t temp_raw = 0;
   float temp_c = 0.0f;
   uint8_t who_am_i = 0U;
@@ -207,17 +250,22 @@ int main(void) {
     }
   }
 
+  ICM42670_Gyro_Calibration(&imu_config);
+
+  ICM42670_Accel_t accel = {0};
+  ICM42670_Gyro_t gyro = {0};
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
     if (imu_ready != 0U) {
-      if ((ICM42670_ReadAccelRaw(&imu_config, accel_raw) == ICM42670_OK) &&
-          (ICM42670_ReadGyroRaw(&imu_config, gyro_raw) == ICM42670_OK) &&
+      if ((ICM42670_ReadAccelG(&imu_config, &accel) == ICM42670_OK) &&
+          (ICM42670_ReadGyroDps(&imu_config, &gyro) == ICM42670_OK) &&
           (ICM42670_ReadTempRaw(&imu_config, &temp_raw) == ICM42670_OK) &&
           (ICM42670_ReadTempC(&imu_config, &temp_c) == ICM42670_OK)) {
-        UART_SendRawSample(accel_raw, gyro_raw, temp_raw, temp_c);
+        UART_SendScaledSample(&accel, &gyro, temp_raw, temp_c);
       } else {
         UART_SendLine("ICM42670 raw read failed\r\n");
       }
