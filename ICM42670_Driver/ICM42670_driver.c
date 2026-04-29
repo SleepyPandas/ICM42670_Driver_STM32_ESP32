@@ -8,6 +8,7 @@
  */
 
 #include "ICM42670_driver.h"
+#include <stdint.h>
 
 static int16_t ICM42670_CombineBytes(uint8_t msb, uint8_t lsb) {
   return (int16_t)(((uint16_t)msb << 8U) | (uint16_t)lsb);
@@ -113,7 +114,7 @@ ICM42670_Status_t ICM42670_Init(ICM42670_Config *config) {
   }
   // Normalize config values to valid ranges (e.g., if user passes in invalid
   // ODR or FS, set to default)
-  
+
   config->accel_fs = ICM42670_NormalizeAccelFs(config->accel_fs);
   config->accel_odr = ICM42670_NormalizeAccelOdr(config->accel_odr);
   config->gyro_fs = ICM42670_NormalizeGyroFs(config->gyro_fs);
@@ -225,5 +226,43 @@ ICM42670_Status_t ICM42670_ReadTempC(const ICM42670_Config *config,
   }
 
   *temp_c = ((float)temp_raw / 128.0f) + 25.0f;
+  return ICM42670_OK;
+}
+
+/**
+ * @brief Perform calibration of the ICM42670 IMU. Does not write to Cal
+ * registers, but instead calculates and returns bias values for accel and gyro.
+ * @note This is a simple calibration routine that assumes the device is
+ * stationary and level during calibration.
+ * @param config Pointer to the ICM42670 configuration structure.
+ * @return Status of the calibration operation.
+ */
+ICM42670_Status_t
+ICM42670_Gyro_Calibration(ICM42670_Config *config) {
+  int32_t gyro_bias[3] = {0};
+  int16_t gyro_raw[3] = {0};
+
+  // Collect multiple samples and average to find bias
+  const int num_samples = 100;
+
+  for (int i = 0; i < num_samples; i++) {
+    if (ICM42670_ReadGyroRaw(config, gyro_raw) != ICM42670_OK) {
+      return ICM42670_ERROR;
+    }
+    gyro_bias[0] += gyro_raw[0];
+    gyro_bias[1] += gyro_raw[1];
+    gyro_bias[2] += gyro_raw[2];
+    config->delay_ms(10);
+  }
+
+  // find raw averages
+  gyro_bias[0] = gyro_bias[0] / num_samples;
+  gyro_bias[1] = gyro_bias[1] / num_samples;
+  gyro_bias[2] = gyro_bias[2] / num_samples;
+
+  config->gyro_offsets.x_raw_offset = (gyro_bias[0]);
+  config->gyro_offsets.y_raw_offset = (gyro_bias[1]);
+  config->gyro_offsets.z_raw_offset = (gyro_bias[2]);
+
   return ICM42670_OK;
 }
