@@ -39,9 +39,9 @@ typedef struct {
 } ICM42670_Gyro_t;
 
 typedef struct {
-  int16_t x_dps_offset;
-  int16_t y_dps_offset;
-  int16_t z_dps_offset;
+  int16_t x_raw_offset;
+  int16_t y_raw_offset;
+  int16_t z_raw_offset;
 } ICM42670_Gyro_Offsets_t;
 
 
