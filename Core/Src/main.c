@@ -22,9 +22,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
 #include "ICM42670_driver.h"
 #include "ports/stm32_hal/ICM42670_stm32_hal.h"
+#include <stdio.h>
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -67,7 +68,8 @@ static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
 static void UART_SendLine(const char *line);
 static void UART_SendRawSample(const int16_t accel_raw[3],
-                               const int16_t gyro_raw[3]);
+                               const int16_t gyro_raw[3], int16_t temp_raw,
+                               float temp_c);
 static void UART_SendWhoAmI(uint8_t who_am_i);
 
 /* USER CODE END PFP */
@@ -75,8 +77,7 @@ static void UART_SendWhoAmI(uint8_t who_am_i);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-static void UART_SendLine(const char *line)
-{
+static void UART_SendLine(const char *line) {
   size_t len = 0U;
 
   if (line == NULL) {
@@ -92,13 +93,24 @@ static void UART_SendLine(const char *line)
 }
 
 static void UART_SendRawSample(const int16_t accel_raw[3],
-                               const int16_t gyro_raw[3])
-{
+                               const int16_t gyro_raw[3], int16_t temp_raw,
+                               float temp_c) {
   char line[128];
+  int32_t temp_centi = (int32_t)((temp_c >= 0.0f) ? (temp_c * 100.0f + 0.5f)
+                                                 : (temp_c * 100.0f - 0.5f));
+  int32_t temp_whole = temp_centi / 100;
+  int32_t temp_frac = temp_centi % 100;
+
+  if (temp_frac < 0) {
+    temp_frac = -temp_frac;
+  }
+
   int len = snprintf(line, sizeof(line),
-                     "ACC raw: X=%d Y=%d Z=%d | GYR raw: X=%d Y=%d Z=%d\r\n",
+                     "ACC raw: X=%d Y=%d Z=%d | GYR raw: X=%d Y=%d Z=%d | "
+                     "TEMP raw: %d TEMP=%ld.%02ld C\r\n",
                      accel_raw[0], accel_raw[1], accel_raw[2], gyro_raw[0],
-                     gyro_raw[1], gyro_raw[2]);
+                     gyro_raw[1], gyro_raw[2], temp_raw, (long)temp_whole,
+                     (long)temp_frac);
 
   if (len > 0) {
     if ((size_t)len >= sizeof(line)) {
@@ -110,8 +122,7 @@ static void UART_SendRawSample(const int16_t accel_raw[3],
   }
 }
 
-static void UART_SendWhoAmI(uint8_t who_am_i)
-{
+static void UART_SendWhoAmI(uint8_t who_am_i) {
   char line[32];
   int len = snprintf(line, sizeof(line), "WHO_AM_I=0x%02X\r\n", who_am_i);
 
@@ -124,11 +135,10 @@ static void UART_SendWhoAmI(uint8_t who_am_i)
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
-{
+ * @brief  The application entry point.
+ * @retval int
+ */
+int main(void) {
 
   /* USER CODE BEGIN 1 */
 
@@ -136,7 +146,8 @@ int main(void)
 
   /* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
+   */
   HAL_Init();
 
   /* USER CODE BEGIN Init */
@@ -166,18 +177,23 @@ int main(void)
   };
   int16_t accel_raw[3] = {0};
   int16_t gyro_raw[3] = {0};
+  int16_t temp_raw = 0;
+  float temp_c = 0.0f;
   uint8_t who_am_i = 0U;
   uint8_t imu_ready = 0U;
 
-  if (ICM42670_STM32_SPI_INIT(&imu_config, &imu_spi_bus, &hspi1,
-                              ICM42670_SPI_CS_GPIO_Port,
-                              ICM42670_SPI_CS_Pin) != ICM42670_OK) {
+  if (ICM42670_STM32_SPI_INIT(
+
+          &imu_config, &imu_spi_bus, &hspi1, ICM42670_SPI_CS_GPIO_Port,
+          ICM42670_SPI_CS_Pin
+
+          ) != ICM42670_OK) {
     UART_SendLine("ICM42670 STM32 SPI setup failed\r\n");
   } else {
     HAL_Delay(10);
 
-    if (imu_config.read_reg(imu_config.handle, ICM42670_REG_WHO_AM_I,
-                            &who_am_i, 1U) == ICM42670_OK) {
+    if (imu_config.read_reg(imu_config.handle, ICM42670_REG_WHO_AM_I, &who_am_i,
+                            1U) == ICM42670_OK) {
       UART_SendWhoAmI(who_am_i);
     } else {
       UART_SendLine("WHO_AM_I read transaction failed\r\n");
@@ -198,8 +214,10 @@ int main(void)
   while (1) {
     if (imu_ready != 0U) {
       if ((ICM42670_ReadAccelRaw(&imu_config, accel_raw) == ICM42670_OK) &&
-          (ICM42670_ReadGyroRaw(&imu_config, gyro_raw) == ICM42670_OK)) {
-        UART_SendRawSample(accel_raw, gyro_raw);
+          (ICM42670_ReadGyroRaw(&imu_config, gyro_raw) == ICM42670_OK) &&
+          (ICM42670_ReadTempRaw(&imu_config, &temp_raw) == ICM42670_OK) &&
+          (ICM42670_ReadTempC(&imu_config, &temp_c) == ICM42670_OK)) {
+        UART_SendRawSample(accel_raw, gyro_raw, temp_raw, temp_c);
       } else {
         UART_SendLine("ICM42670 raw read failed\r\n");
       }
@@ -209,31 +227,29 @@ int main(void)
 
     /* USER CODE END WHILE */
 
-
     /* USER CODE BEGIN 3 */
-
   }
   /* USER CODE END 3 */
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
+ * @brief System Clock Configuration
+ * @retval None
+ */
+void SystemClock_Config(void) {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-  */
+   */
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
 
-  while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
+  while (!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {
+  }
 
   /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
+   * in the RCC_OscInitTypeDef structure.
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
@@ -246,39 +262,36 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1_VCIRANGE_3;
   RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1_VCORANGE_WIDE;
   RCC_OscInitStruct.PLL.PLLFRACN = 5462;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
     Error_Handler();
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2
-                              |RCC_CLOCKTYPE_PCLK3;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
+                                RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 |
+                                RCC_CLOCKTYPE_PCLK3;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB3CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
-  {
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK) {
     Error_Handler();
   }
 
   /** Configure the programming delay
-  */
+   */
   __HAL_FLASH_SET_PROGRAM_DELAY(FLASH_PROGRAMMING_DELAY_1);
 }
 
 /**
-  * @brief I2C1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_I2C1_Init(void)
-{
+ * @brief I2C1 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_I2C1_Init(void) {
 
   /* USER CODE BEGIN I2C1_Init 0 */
 
@@ -296,44 +309,38 @@ static void MX_I2C1_Init(void)
   hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
   hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
   hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
-  {
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK) {
     Error_Handler();
   }
 
   /** Configure Analogue filter
-  */
-  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
-  {
+   */
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK) {
     Error_Handler();
   }
 
   /** Configure Digital filter
-  */
-  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
-  {
+   */
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK) {
     Error_Handler();
   }
 
   /** I2C Fast mode Plus enable
-  */
-  if (HAL_I2CEx_ConfigFastModePlus(&hi2c1, I2C_FASTMODEPLUS_ENABLE) != HAL_OK)
-  {
+   */
+  if (HAL_I2CEx_ConfigFastModePlus(&hi2c1, I2C_FASTMODEPLUS_ENABLE) != HAL_OK) {
     Error_Handler();
   }
   /* USER CODE BEGIN I2C1_Init 2 */
 
   /* USER CODE END I2C1_Init 2 */
-
 }
 
 /**
-  * @brief ICACHE Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_ICACHE_Init(void)
-{
+ * @brief ICACHE Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_ICACHE_Init(void) {
 
   /* USER CODE BEGIN ICACHE_Init 0 */
 
@@ -344,24 +351,21 @@ static void MX_ICACHE_Init(void)
   /* USER CODE END ICACHE_Init 1 */
 
   /** Enable instruction cache (default 2-ways set associative cache)
-  */
-  if (HAL_ICACHE_Enable() != HAL_OK)
-  {
+   */
+  if (HAL_ICACHE_Enable() != HAL_OK) {
     Error_Handler();
   }
   /* USER CODE BEGIN ICACHE_Init 2 */
 
   /* USER CODE END ICACHE_Init 2 */
-
 }
 
 /**
-  * @brief SPI1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SPI1_Init(void)
-{
+ * @brief SPI1 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_SPI1_Init(void) {
 
   /* USER CODE BEGIN SPI1_Init 0 */
 
@@ -393,23 +397,20 @@ static void MX_SPI1_Init(void)
   hspi1.Init.IOSwap = SPI_IO_SWAP_DISABLE;
   hspi1.Init.ReadyMasterManagement = SPI_RDY_MASTER_MANAGEMENT_INTERNALLY;
   hspi1.Init.ReadyPolarity = SPI_RDY_POLARITY_HIGH;
-  if (HAL_SPI_Init(&hspi1) != HAL_OK)
-  {
+  if (HAL_SPI_Init(&hspi1) != HAL_OK) {
     Error_Handler();
   }
   /* USER CODE BEGIN SPI1_Init 2 */
 
   /* USER CODE END SPI1_Init 2 */
-
 }
 
 /**
-  * @brief USART3 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART3_UART_Init(void)
-{
+ * @brief USART3 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_USART3_UART_Init(void) {
 
   /* USER CODE BEGIN USART3_Init 0 */
 
@@ -429,35 +430,31 @@ static void MX_USART3_UART_Init(void)
   huart3.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
   huart3.Init.ClockPrescaler = UART_PRESCALER_DIV1;
   huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init(&huart3) != HAL_OK)
-  {
+  if (HAL_UART_Init(&huart3) != HAL_OK) {
     Error_Handler();
   }
-  if (HAL_UARTEx_SetTxFifoThreshold(&huart3, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart3, UART_TXFIFO_THRESHOLD_1_8) !=
+      HAL_OK) {
     Error_Handler();
   }
-  if (HAL_UARTEx_SetRxFifoThreshold(&huart3, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart3, UART_RXFIFO_THRESHOLD_1_8) !=
+      HAL_OK) {
     Error_Handler();
   }
-  if (HAL_UARTEx_DisableFifoMode(&huart3) != HAL_OK)
-  {
+  if (HAL_UARTEx_DisableFifoMode(&huart3) != HAL_OK) {
     Error_Handler();
   }
   /* USER CODE BEGIN USART3_Init 2 */
 
   /* USER CODE END USART3_Init 2 */
-
 }
 
 /**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_GPIO_Init(void) {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
 
@@ -470,10 +467,11 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, LCD_DC_Pin|LCD_RES_Pin|CS_SPI_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LCD_DC_Pin | LCD_RES_Pin | CS_SPI_Pin,
+                    GPIO_PIN_RESET);
 
   /*Configure GPIO pins : ARD_D1_TX_Pin ARD_D0_RX_Pin */
-  GPIO_InitStruct.Pin = ARD_D1_TX_Pin|ARD_D0_RX_Pin;
+  GPIO_InitStruct.Pin = ARD_D1_TX_Pin | ARD_D0_RX_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -481,7 +479,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LCD_DC_Pin LCD_RES_Pin CS_SPI_Pin */
-  GPIO_InitStruct.Pin = LCD_DC_Pin|LCD_RES_Pin|CS_SPI_Pin;
+  GPIO_InitStruct.Pin = LCD_DC_Pin | LCD_RES_Pin | CS_SPI_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -497,11 +495,10 @@ static void MX_GPIO_Init(void)
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Error_Handler(void) {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
@@ -511,14 +508,13 @@ void Error_Handler(void)
 }
 #ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
+void assert_failed(uint8_t *file, uint32_t line) {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line
      number, ex: printf("Wrong parameters value: file %s on line %d\r\n", file,
