@@ -208,10 +208,47 @@ ICM42670_Status_t ICM42670_ReadTempRaw(const ICM42670_Config *config,
 }
 
 ICM42670_Status_t ICM42670_ReadAccelG(const ICM42670_Config *config,
-                                      ICM42670_Accel_t *accel);
+                                      ICM42670_Accel_t *accel) {
+  int16_t accel_raw[3] = {0};
+  float lsb_per_g = 0.0f;
+
+  if ((config == 0) || (accel == 0)) {
+    return ICM42670_ERROR;
+  }
+
+  if (ICM42670_ReadAccelRaw(config, accel_raw) != ICM42670_OK) {
+    return ICM42670_ERROR;
+  }
+
+  lsb_per_g = ICM42670_AccelLsbPerG(config->accel_fs);
+  accel->x_g = (float)accel_raw[0] / lsb_per_g;
+  accel->y_g = (float)accel_raw[1] / lsb_per_g;
+  accel->z_g = (float)accel_raw[2] / lsb_per_g;
+  return ICM42670_OK;
+}
 
 ICM42670_Status_t ICM42670_ReadGyroDps(const ICM42670_Config *config,
-                                       ICM42670_Gyro_t *gyro);
+                                       ICM42670_Gyro_t *gyro) {
+  int16_t gyro_raw[3] = {0};
+  float lsb_per_dps = 0.0f;
+
+  if ((config == 0) || (gyro == 0)) {
+    return ICM42670_ERROR;
+  }
+
+  if (ICM42670_ReadGyroRaw(config, gyro_raw) != ICM42670_OK) {
+    return ICM42670_ERROR;
+  }
+
+  lsb_per_dps = ICM42670_GyroLsbPerDps(config->gyro_fs);
+  gyro->x_dps =
+      (float)(gyro_raw[0] - config->gyro_offsets.x_raw_offset) / lsb_per_dps;
+  gyro->y_dps =
+      (float)(gyro_raw[1] - config->gyro_offsets.y_raw_offset) / lsb_per_dps;
+  gyro->z_dps =
+      (float)(gyro_raw[2] - config->gyro_offsets.z_raw_offset) / lsb_per_dps;
+  return ICM42670_OK;
+}
 
 ICM42670_Status_t ICM42670_ReadTempC(const ICM42670_Config *config,
                                      float *temp_c) {
@@ -237,8 +274,7 @@ ICM42670_Status_t ICM42670_ReadTempC(const ICM42670_Config *config,
  * @param config Pointer to the ICM42670 configuration structure.
  * @return Status of the calibration operation.
  */
-ICM42670_Status_t
-ICM42670_Gyro_Calibration(ICM42670_Config *config) {
+ICM42670_Status_t ICM42670_Gyro_Calibration(ICM42670_Config *config) {
   int32_t gyro_bias[3] = {0};
   int16_t gyro_raw[3] = {0};
 
