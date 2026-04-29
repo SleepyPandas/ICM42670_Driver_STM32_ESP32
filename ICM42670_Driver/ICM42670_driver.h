@@ -38,6 +38,13 @@ typedef struct {
   float z_dps;
 } ICM42670_Gyro_t;
 
+typedef struct {
+  int16_t x_dps_offset;
+  int16_t y_dps_offset;
+  int16_t z_dps_offset;
+} ICM42670_Gyro_Offsets_t;
+
+
 typedef enum {
   ICM42670_ACCEL_FS_16G = 0x00U,
   ICM42670_ACCEL_FS_8G = 0x20U,
@@ -66,12 +73,17 @@ typedef enum {
   ICM42670_ACCEL_ODR_1_5625_HZ = 0x0FU,
 } ICM42670_Odr_t;
 
+
+
+
 typedef struct {
 
   ICM42670_Odr_t accel_odr;    // Output Data Rate for accelerometer
   ICM42670_AccelFS_t accel_fs; // Full Scale range for accelerometer
   ICM42670_Odr_t gyro_odr;     // Output Data Rate for gyroscope
   ICM42670_GyroFS_t gyro_fs;   // Full Scale range for gyroscope
+
+  ICM42670_Gyro_Offsets_t gyro_offsets; // Optional gyro offset values to apply to raw readings
 
   void *handle; // User-defined handle for read/write/delay functions (e.g., I2C
                 // or SPI handle / BUS type)
@@ -103,6 +115,8 @@ ICM42670_Status_t ICM42670_ReadGyroDps(const ICM42670_Config *config,
 
 ICM42670_Status_t ICM42670_ReadTempC(const ICM42670_Config *config,
                                      float *temp_c);
+
+ICM42670_Status_t ICM42670_Gyro_Calibration(ICM42670_Config *config);
 #ifdef __cplusplus
 }
 #endif
