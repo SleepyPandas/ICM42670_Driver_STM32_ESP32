@@ -189,8 +189,41 @@ ICM42670_Status_t ICM42670_ReadGyroRaw(const ICM42670_Config *config,
   return ICM42670_OK;
 }
 
+ICM42670_Status_t ICM42670_ReadTempRaw(const ICM42670_Config *config,
+                                       int16_t *temp_raw) {
+  uint8_t raw[ICM42670_TEMP_DATA_LEN] = {0};
+
+  if ((config == 0) || (config->read_reg == 0) || (temp_raw == 0)) {
+    return ICM42670_ERROR;
+  }
+
+  if (config->read_reg(config->handle, ICM42670_REG_TEMP_DATA1, raw,
+                       ICM42670_TEMP_DATA_LEN) != ICM42670_OK) {
+    return ICM42670_ERROR;
+  }
+
+  *temp_raw = ICM42670_CombineBytes(raw[0], raw[1]);
+  return ICM42670_OK;
+}
+
 ICM42670_Status_t ICM42670_ReadAccelG(const ICM42670_Config *config,
                                       ICM42670_Accel_t *accel);
 
 ICM42670_Status_t ICM42670_ReadGyroDps(const ICM42670_Config *config,
                                        ICM42670_Gyro_t *gyro);
+
+ICM42670_Status_t ICM42670_ReadTempC(const ICM42670_Config *config,
+                                     float *temp_c) {
+  int16_t temp_raw = 0;
+
+  if (temp_c == 0) {
+    return ICM42670_ERROR;
+  }
+
+  if (ICM42670_ReadTempRaw(config, &temp_raw) != ICM42670_OK) {
+    return ICM42670_ERROR;
+  }
+
+  *temp_c = ((float)temp_raw / 128.0f) + 25.0f;
+  return ICM42670_OK;
+}
