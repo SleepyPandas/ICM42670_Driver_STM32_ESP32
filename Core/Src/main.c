@@ -22,6 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "ICM42670_apex.h"
 #include "ICM42670_driver.h"
 #include "ports/stm32_hal/ICM42670_stm32_hal.h"
 #include <stdio.h>
@@ -71,6 +72,14 @@ static void UART_SendScaledSample(const ICM42670_Accel_t *accel,
                                   const ICM42670_Gyro_t *gyro,
                                   int16_t temp_raw, float temp_c);
 static void UART_SendWhoAmI(uint8_t who_am_i);
+static void UART_SendApexEnableStatus(const char *name,
+                                      ICM42670_Status_t status);
+static void UART_SendApexData(const ICM42670_PedoData_t *pedo,
+                              uint8_t tilt_detected, uint8_t low_g_detected,
+                              const ICM42670_FreeFallData_t *free_fall,
+                              const ICM42670_WakeOnMotionData_t *wom,
+                              uint8_t smd_detected);
+static void ICM42670_EnableApexSmokeTest(const ICM42670_Config *config);
 
 /* USER CODE END PFP */
 
@@ -177,6 +186,93 @@ static void UART_SendWhoAmI(uint8_t who_am_i) {
   }
 }
 
+static void UART_SendApexEnableStatus(const char *name,
+                                      ICM42670_Status_t status) {
+  char line[64];
+  int len = 0;
+
+  if (name == NULL) {
+    return;
+  }
+
+  len = snprintf(line, sizeof(line), "APEX enable %-4s: %ld\r\n", name,
+                 (long)status);
+  if (len > 0) {
+    if ((size_t)len >= sizeof(line)) {
+      len = (int)sizeof(line) - 1;
+    }
+
+    (void)HAL_UART_Transmit(&huart3, (uint8_t *)line, (uint16_t)len,
+                            HAL_MAX_DELAY);
+  }
+}
+
+static void UART_SendApexData(const ICM42670_PedoData_t *pedo,
+                              uint8_t tilt_detected, uint8_t low_g_detected,
+                              const ICM42670_FreeFallData_t *free_fall,
+                              const ICM42670_WakeOnMotionData_t *wom,
+                              uint8_t smd_detected) {
+  char line[192];
+  int len = 0;
+
+  if ((pedo == NULL) || (free_fall == NULL) || (wom == NULL)) {
+    return;
+  }
+
+  len = snprintf(line, sizeof(line),
+                 "APEX: steps=%u step=%u ovf=%u act=%u tilt=%u lowg=%u "
+                 "ff=%u ff_dur=%u wom=%u/%u/%u smd=%u\r\n",
+                 (unsigned)pedo->step_count, (unsigned)pedo->step_detected,
+                 (unsigned)pedo->overflow, (unsigned)pedo->activity,
+                 (unsigned)tilt_detected, (unsigned)low_g_detected,
+                 (unsigned)free_fall->detected,
+                 (unsigned)free_fall->duration_samples,
+                 (unsigned)wom->x_detected, (unsigned)wom->y_detected,
+                 (unsigned)wom->z_detected, (unsigned)smd_detected);
+
+  if (len > 0) {
+    if ((size_t)len >= sizeof(line)) {
+      len = (int)sizeof(line) - 1;
+    }
+
+    (void)HAL_UART_Transmit(&huart3, (uint8_t *)line, (uint16_t)len,
+                            HAL_MAX_DELAY);
+  }
+}
+
+static void ICM42670_EnableApexSmokeTest(const ICM42670_Config *config) {
+  ICM42670_PedoConfig_t pedo_config = {.slow_walk_enable = 1U};
+  ICM42670_TiltConfig_t tilt_config = {.wait_time_s = 2U};
+  ICM42670_LowGConfig_t low_g_config = {.threshold_mg = 250U,
+                                        .sample_count = 4U};
+  ICM42670_FreeFallConfig_t free_fall_config = {.min_distance_cm = 10U,
+                                                .max_distance_cm = 102U,
+                                                .debounce_ms = 1250U};
+  ICM42670_WakeOnMotionConfig_t wom_config = {.x_threshold_mg = 400U,
+                                              .y_threshold_mg = 400U,
+                                              .z_threshold_mg = 400U};
+  ICM42670_SignificantMotionConfig_t smd_config = {.sensitivity_level = 2U};
+  ICM42670_Status_t apex_init_status = ICM42670_Init_Apex(config);
+
+  UART_SendApexEnableStatus("INIT", apex_init_status);
+  if (apex_init_status != ICM42670_OK) {
+    return;
+  }
+
+  UART_SendApexEnableStatus("PEDO",
+                            ICM42670_Enable_Pedo(config, &pedo_config));
+  UART_SendApexEnableStatus("TILT",
+                            ICM42670_Enable_Tilt(config, &tilt_config));
+  UART_SendApexEnableStatus("LOWG",
+                            ICM42670_Enable_Low_G(config, &low_g_config));
+  UART_SendApexEnableStatus(
+      "FF", ICM42670_Enable_Free_Fall(config, &free_fall_config));
+  UART_SendApexEnableStatus("WOM",
+                            ICM42670_Enable_Wake_On_Motion(config, &wom_config));
+  UART_SendApexEnableStatus(
+      "SMD", ICM42670_Enable_Significant_Motion(config, &smd_config));
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -224,6 +320,8 @@ int main(void) {
   float temp_c = 0.0f;
   uint8_t who_am_i = 0U;
   uint8_t imu_ready = 0U;
+  ICM42670_ApexData_t apex_data = {0};
+  ICM42670_Status_t apex_status = ICM42670_ERROR;
 
   if (ICM42670_STM32_SPI_INIT(
 
@@ -245,12 +343,15 @@ int main(void) {
     if (ICM42670_Init(&imu_config) == ICM42670_OK) {
       imu_ready = 1U;
       UART_SendLine("ICM42670 init OK\r\n");
+      ICM42670_EnableApexSmokeTest(&imu_config);
     } else {
       UART_SendLine("ICM42670 init failed\r\n");
     }
   }
 
-  ICM42670_Gyro_Calibration(&imu_config);
+  if (imu_ready != 0U) {
+    ICM42670_Gyro_Calibration(&imu_config);
+  }
 
   ICM42670_Accel_t accel = {0};
   ICM42670_Gyro_t gyro = {0};
@@ -269,9 +370,19 @@ int main(void) {
       } else {
         UART_SendLine("ICM42670 raw read failed\r\n");
       }
+
+      apex_status = ICM42670_Read_Apex(&imu_config, &apex_data);
+      if (apex_status == ICM42670_OK) {
+        UART_SendApexData(&apex_data.pedo, apex_data.tilt_detected,
+                          apex_data.low_g_detected, &apex_data.free_fall,
+                          &apex_data.wake_on_motion,
+                          apex_data.significant_motion_detected);
+      } else {
+        UART_SendLine("ICM42670 APEX read failed\r\n");
+      }
     }
 
-    HAL_Delay(1);
+    HAL_Delay(200);
 
     /* USER CODE END WHILE */
 
