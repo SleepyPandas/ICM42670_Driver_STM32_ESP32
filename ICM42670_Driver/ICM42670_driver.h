@@ -73,6 +73,60 @@ typedef enum {
   ICM42670_ACCEL_ODR_1_5625_HZ = 0x0FU,
 } ICM42670_Odr_t;
 
+typedef enum {
+  /**
+   * @brief Sleep mode: gyro off, accel off.
+   *
+   * Lowest normal sensor-off state. MREG access is not available in sleep
+   * unless the RC oscillator is kept on with PWR_MGMT0.IDLE.
+   */
+  ICM42670_POWER_SLEEP = 0x00U,
+
+  /**
+   * @brief Standby mode: gyro drive on, accel off.
+   *
+   * Use when preparing gyro operation without accelerometer data. The gyro
+   * should stay enabled for at least 45 ms once powered on, and callers should
+   * wait more than 20 ms after powering it off before enabling it again.
+   */
+  ICM42670_POWER_STANDBY,
+
+  /**
+   * @brief Accelerometer low-power mode: gyro off, accel duty-cycled.
+   *
+   * Use for low-current, always-on motion sensing. Configure a valid
+   * accelerometer ODR and LP averaging before entering this mode: 1600 Hz and
+   * 800 Hz are LN-only, while 6.25 Hz, 3.125 Hz, and 1.5625 Hz are LP-only.
+   * MREG access is not supported with the WUOSC LP clock unless IDLE enables
+   * the RC oscillator.
+   */
+  ICM42670_POWER_ACCEL_LP,
+
+  /**
+   * @brief Accelerometer low-noise mode: gyro off, accel on.
+   *
+   * Use for accelerometer-only reads when lower noise is more important than
+   * minimum current draw.
+   */
+  ICM42670_POWER_ACCEL_LN,
+
+  /**
+   * @brief Gyroscope low-noise mode: gyro on, accel off.
+   *
+   * Use for gyroscope-only reads. The ICM-42670-P does not provide a gyro
+   * low-power measurement mode.
+   */
+  ICM42670_POWER_GYRO_LN,
+
+  /**
+   * @brief 6-axis low-noise mode: gyro on, accel on.
+   *
+   * Use when both accelerometer and gyroscope data are needed. This is the
+   * default mode selected by ICM42670_Init().
+   */
+  ICM42670_POWER_6AXIS_LN,
+} ICM42670_PowerState_t;
+
 
 
 
@@ -97,6 +151,17 @@ typedef struct {
 } ICM42670_Config;
 
 ICM42670_Status_t ICM42670_Init(ICM42670_Config *config);
+
+/**
+ * @brief Switch the ICM-42670-P to one of the standard datasheet power modes.
+ *
+ * This writes PWR_MGMT0 and then waits 1 ms so the datasheet's 200 us
+ * no-register-write window is respected when either sensor transitions from
+ * off to an active mode. Gyro off/on timing and accel LP ODR/filter
+ * restrictions remain caller responsibilities.
+ */
+ICM42670_Status_t ICM42670_SetPowerState(ICM42670_Config *config,
+                                         ICM42670_PowerState_t state);
 
 ICM42670_Status_t ICM42670_ReadAccelRaw(const ICM42670_Config *config,
                                         int16_t accel_raw[3]);
