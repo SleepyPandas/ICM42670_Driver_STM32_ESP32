@@ -72,6 +72,23 @@ typedef struct {
   uint8_t sensitivity_level;
 } ICM42670_SignificantMotionConfig_t;
 
+typedef struct {
+  ICM42670_PedoData_t pedo;
+  ICM42670_FreeFallData_t free_fall;
+  ICM42670_WakeOnMotionData_t wake_on_motion;
+  uint8_t tilt_detected;
+  uint8_t low_g_detected;
+  uint8_t significant_motion_detected;
+} ICM42670_ApexData_t;
+
+/**
+ * @brief Initialize the APEX DMP block before enabling tilt/pedometer features.
+ *
+ * This sets DMP_ODR to 50 Hz, disables DMP power-save for direct polling use,
+ * resets APEX memory, and runs the DMP initialization command.
+ */
+ICM42670_Status_t ICM42670_Init_Apex(const ICM42670_Config *config);
+
 /**
  * @brief Pedometer tracks step count and issues a step detect interrupt.
  */
@@ -139,6 +156,9 @@ ICM42670_Status_t ICM42670_Enable_Significant_Motion(
 ICM42670_Status_t ICM42670_Disable_Significant_Motion(const ICM42670_Config *config);
 ICM42670_Status_t ICM42670_Read_Significant_Motion(const ICM42670_Config *config,
                                  uint8_t *significant_motion_detected);
+
+ICM42670_Status_t ICM42670_Read_Apex(const ICM42670_Config *config,
+                                     ICM42670_ApexData_t *apex_data);
 
 #ifdef __cplusplus
 }
