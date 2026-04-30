@@ -102,11 +102,61 @@ static float ICM42670_GyroLsbPerDps(ICM42670_GyroFS_t gyro_fs) {
   }
 }
 
+static ICM42670_Status_t
+ICM42670_PowerStateToReg(ICM42670_PowerState_t state, uint8_t *pwr_mgmt0) {
+  if (pwr_mgmt0 == 0) {
+    return ICM42670_ERROR;
+  }
+
+  switch (state) {
+  case ICM42670_POWER_SLEEP:
+    *pwr_mgmt0 = ICM42670_PWR_GYRO_OFF | ICM42670_PWR_ACCEL_OFF;
+    return ICM42670_OK;
+  case ICM42670_POWER_STANDBY:
+    *pwr_mgmt0 = ICM42670_PWR_GYRO_STANDBY | ICM42670_PWR_ACCEL_OFF;
+    return ICM42670_OK;
+  case ICM42670_POWER_ACCEL_LP:
+    *pwr_mgmt0 = ICM42670_PWR_GYRO_OFF | ICM42670_PWR_ACCEL_LP;
+    return ICM42670_OK;
+  case ICM42670_POWER_ACCEL_LN:
+    *pwr_mgmt0 = ICM42670_PWR_GYRO_OFF | ICM42670_PWR_ACCEL_LN;
+    return ICM42670_OK;
+  case ICM42670_POWER_GYRO_LN:
+    *pwr_mgmt0 = ICM42670_PWR_GYRO_LN | ICM42670_PWR_ACCEL_OFF;
+    return ICM42670_OK;
+  case ICM42670_POWER_6AXIS_LN:
+    *pwr_mgmt0 = ICM42670_PWR_ACCEL_GYRO_LN;
+    return ICM42670_OK;
+  default:
+    return ICM42670_ERROR;
+  }
+}
+
+ICM42670_Status_t ICM42670_SetPowerState(ICM42670_Config *config,
+                                         ICM42670_PowerState_t state) {
+  uint8_t pwr_mgmt0 = 0;
+
+  if ((config == 0) || (config->write_reg == 0) || (config->delay_ms == 0)) {
+    return ICM42670_ERROR;
+  }
+
+  if (ICM42670_PowerStateToReg(state, &pwr_mgmt0) != ICM42670_OK) {
+    return ICM42670_ERROR;
+  }
+
+  if (config->write_reg(config->handle, ICM42670_REG_PWR_MGMT0, &pwr_mgmt0,
+                        1) != ICM42670_OK) {
+    return ICM42670_ERROR;
+  }
+
+  config->delay_ms(1);
+  return ICM42670_OK;
+}
+
 ICM42670_Status_t ICM42670_Init(ICM42670_Config *config) {
   uint8_t who_am_i = 0;
   uint8_t gyro_config = 0;
   uint8_t accel_config = 0;
-  uint8_t pwr_mgmt0 = ICM42670_PWR_ACCEL_GYRO_LN;
   // Check for null pointers in config and required function pointers
   if ((config == 0) || (config->read_reg == 0) || (config->write_reg == 0) ||
       (config->delay_ms == 0)) {
@@ -143,8 +193,8 @@ ICM42670_Status_t ICM42670_Init(ICM42670_Config *config) {
     return ICM42670_ERROR;
   }
 
-  if (config->write_reg(config->handle, ICM42670_REG_PWR_MGMT0, &pwr_mgmt0,
-                        1) != ICM42670_OK) {
+  if (ICM42670_SetPowerState(config, ICM42670_POWER_6AXIS_LN) !=
+      ICM42670_OK) {
     return ICM42670_ERROR;
   }
 
