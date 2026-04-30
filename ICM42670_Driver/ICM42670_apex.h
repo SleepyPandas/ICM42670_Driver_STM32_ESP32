@@ -16,16 +16,23 @@ extern "C" {
 
 
 
+ICM42670_Status_t ICM42670_Enable_Pedo(const ICM42670_Config *config);
+ICM42670_Status_t ICM42670_Disable_Pedo(const ICM42670_Config *config);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+ICM42670_Status_t ICM42670_Enable_Tilt(const ICM42670_Config *config);
+ICM42670_Status_t ICM42670_Disable_Tilt(const ICM42670_Config *config);
 
+ICM42670_Status_t ICM42670_Enable_Low_G(const ICM42670_Config *config);
+ICM42670_Status_t ICM42670_Disable_Low_G(const ICM42670_Config *config);
 
+ICM42670_Status_t ICM42670_Enable_Free_Fall(const ICM42670_Config *config);
+ICM42670_Status_t ICM42670_Disable_Free_Fall(const ICM42670_Config *config);
 
+ICM42670_Status_t ICM42670_Enable_Wake_On_Motion(const ICM42670_Config *config);
+ICM42670_Status_t ICM42670_Disable_Wake_On_Motion(const ICM42670_Config *config);
 
-
-
+ICM42670_Status_t ICM42670_Enable_Significant_Motion(const ICM42670_Config *config);
+ICM42670_Status_t ICM42670_Disable_Significant_Motion(const ICM42670_Config *config);
 
 #ifdef __cplusplus
 }
