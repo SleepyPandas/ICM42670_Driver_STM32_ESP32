@@ -67,10 +67,12 @@ void Error_Handler(void);
 #define ARD_D0_RX_GPIO_Port GPIOB
 #define LCD_DC_Pin GPIO_PIN_6
 #define LCD_DC_GPIO_Port GPIOC
-#define LCD_RES_Pin GPIO_PIN_7
-#define LCD_RES_GPIO_Port GPIOC
+#define INT1_INPUT_Pin GPIO_PIN_7
+#define INT1_INPUT_GPIO_Port GPIOC
 #define CS_SPI_Pin GPIO_PIN_9
 #define CS_SPI_GPIO_Port GPIOC
+#define INT2_INPUT_Pin GPIO_PIN_8
+#define INT2_INPUT_GPIO_Port GPIOA
 #define T_SWDIO_Pin GPIO_PIN_13
 #define T_SWDIO_GPIO_Port GPIOA
 #define T_SWCLK_Pin GPIO_PIN_14
