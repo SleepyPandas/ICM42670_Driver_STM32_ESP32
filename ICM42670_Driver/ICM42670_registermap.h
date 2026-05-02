@@ -121,6 +121,11 @@ extern "C" {
 #define ICM42670_PWR_ACCEL_GYRO_LN                                             \
   (ICM42670_PWR_GYRO_LN | ICM42670_PWR_ACCEL_LN)
 
+/* GYRO_CONFIG0 and ACCEL_CONFIG0 field masks. */
+#define ICM42670_GYRO_CONFIG0_FS_SEL_MASK 0x60U
+#define ICM42670_GYRO_CONFIG0_ODR_MASK 0x0FU
+#define ICM42670_ACCEL_CONFIG0_FS_SEL_MASK 0x60U
+#define ICM42670_ACCEL_CONFIG0_ODR_MASK 0x0FU
 
 /* Common config bytes. */
 #define ICM42670_GYRO_CONFIG0_2000DPS_100HZ                                    \
