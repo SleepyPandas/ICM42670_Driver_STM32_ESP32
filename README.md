@@ -6,7 +6,7 @@ Should be able to call a couple of functions and simple pointers to get started 
 After there should be more complex configurations if you need them for example: self-test registers, FIFO, Power Modes, Noise Filtering, calibration etc.
 
 
-1. Enable abstract or function pointers for platform agnostic use 
+~~1. Enable abstract or function pointers for platform agnostic use~~ 
 
     1.1 Expose I2C, SPI and Optionally I3C 
 
@@ -23,7 +23,7 @@ After there should be more complex configurations if you need them for example: 
     3.1 Expose Read from Register for Gyro/Accel and also read from FIFO buffer 
 4. Interrupt Routing for INT1 / INT2 in conjunction with Apex READY and DATA ready 
 
-5. Expose Apex functions in simple abstract layer  
+~~5. Expose Apex functions in simple abstract layer~~  
 
 6. Expose a function to use FSYNC 
 
