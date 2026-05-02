@@ -74,6 +74,22 @@ static ICM42670_Odr_t ICM42670_NormalizeGyroOdr(ICM42670_Odr_t odr) {
   }
 }
 
+static ICM42670_Lpf_t ICM42670_NormalizeLpf(ICM42670_Lpf_t lpf) {
+  switch (lpf) {
+  case ICM42670_LPF_BYPASSED:
+  case ICM42670_LPF_180_HZ:
+  case ICM42670_LPF_121_HZ:
+  case ICM42670_LPF_73_HZ:
+  case ICM42670_LPF_53_HZ:
+  case ICM42670_LPF_34_HZ:
+  case ICM42670_LPF_25_HZ:
+  case ICM42670_LPF_16_HZ:
+    return lpf;
+  default:
+    return ICM42670_LPF_180_HZ;
+  }
+}
+
 static float ICM42670_AccelLsbPerG(ICM42670_AccelFS_t accel_fs) {
   switch (accel_fs) {
   case ICM42670_ACCEL_FS_2G:
@@ -229,6 +245,24 @@ ICM42670_Status_t ICM42670_SetGyroOdr(ICM42670_Config *config,
 
   config->gyro_odr = odr;
   return ICM42670_OK;
+}
+
+ICM42670_Status_t ICM42670_SetAccelLpf(ICM42670_Config *config,
+                                       ICM42670_Lpf_t lpf) {
+  lpf = ICM42670_NormalizeLpf(lpf);
+
+  return ICM42670_UpdateRegBits(config, ICM42670_REG_ACCEL_CONFIG1,
+                                ICM42670_ACCEL_CONFIG1_UI_FILT_BW_MASK,
+                                (uint8_t)lpf);
+}
+
+ICM42670_Status_t ICM42670_SetGyroLpf(ICM42670_Config *config,
+                                      ICM42670_Lpf_t lpf) {
+  lpf = ICM42670_NormalizeLpf(lpf);
+
+  return ICM42670_UpdateRegBits(config, ICM42670_REG_GYRO_CONFIG1,
+                                ICM42670_GYRO_CONFIG1_UI_FILT_BW_MASK,
+                                (uint8_t)lpf);
 }
 
 ICM42670_Status_t ICM42670_Init(ICM42670_Config *config) {
