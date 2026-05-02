@@ -36,8 +36,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define ICM42670_SPI_CS_GPIO_Port CS_SPI_GPIO_Port
-#define ICM42670_SPI_CS_Pin CS_SPI_Pin
+#define ICM42670_I3C_TARGET_DYNAMIC_ADDR 0x32U
+#define ICM42670_I3C_DAA_TIMEOUT_MS 1000U
 
 /* USER CODE END PD */
 
@@ -55,6 +55,7 @@ SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
+static uint8_t uart3_ready = 0U;
 
 /* USER CODE END PV */
 
@@ -62,7 +63,6 @@ UART_HandleTypeDef huart3;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ICACHE_Init(void);
-static void MX_SPI1_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_I3C1_Init(void);
 /* USER CODE BEGIN PFP */
@@ -81,6 +81,9 @@ static void UART_SendApexData(const ICM42670_PedoData_t *pedo,
 static ICM42670_Status_t
 ICM42670_EnableInterruptTraceTest(const ICM42670_Config *config);
 static void ICM42670_EnableApexSmokeTest(const ICM42670_Config *config);
+static ICM42670_Status_t
+ICM42670_AssignI3CDynamicAddress(I3C_HandleTypeDef *hi3c,
+                                 uint8_t target_dynamic_addr);
 
 /* USER CODE END PFP */
 
@@ -242,6 +245,52 @@ static void UART_SendApexData(const ICM42670_PedoData_t *pedo,
 }
 
 static ICM42670_Status_t
+ICM42670_AssignI3CDynamicAddress(I3C_HandleTypeDef *hi3c,
+                                 uint8_t target_dynamic_addr) {
+  uint64_t target_payload = 0U;
+  HAL_StatusTypeDef status;
+  uint8_t attempts = 0U;
+
+  if (hi3c == NULL) {
+    return ICM42670_ERROR;
+  }
+
+  UART_SendLine("I3C DAA start\r\n");
+
+  status = HAL_I3C_Ctrl_DynAddrAssign(hi3c, &target_payload,
+                                      I3C_RSTDAA_THEN_ENTDAA,
+                                      ICM42670_I3C_DAA_TIMEOUT_MS);
+
+  while ((status == HAL_BUSY) && (attempts < 4U)) {
+    UART_SendLine("I3C DAA target found, assigning address\r\n");
+
+    if (HAL_I3C_Ctrl_SetDynAddr(hi3c, target_dynamic_addr) != HAL_OK) {
+      UART_SendLine("I3C DAA SetDynAddr failed\r\n");
+      return ICM42670_ERROR;
+    }
+
+    attempts++;
+    status = HAL_I3C_Ctrl_DynAddrAssign(hi3c, &target_payload,
+                                        I3C_ONLY_ENTDAA,
+                                        ICM42670_I3C_DAA_TIMEOUT_MS);
+  }
+
+  if (status != HAL_OK) {
+    UART_SendLine("I3C DAA failed\r\n");
+    return ICM42670_ERROR;
+  }
+
+  if (HAL_I3C_Ctrl_IsDeviceI3C_Ready(hi3c, target_dynamic_addr, 3U,
+                                     ICM42670_I3C_DAA_TIMEOUT_MS) != HAL_OK) {
+    UART_SendLine("I3C target not ready\r\n");
+    return ICM42670_ERROR;
+  }
+
+  UART_SendLine("I3C DAA OK\r\n");
+  return ICM42670_OK;
+}
+
+static ICM42670_Status_t
 ICM42670_EnableInterruptTraceTest(const ICM42670_Config *config) {
   const uint8_t int_config =
       ICM42670_INT_CONFIG_BOTH_LATCHED_PUSH_PULL_ACTIVE_HIGH;
@@ -344,11 +393,14 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ICACHE_Init();
-  MX_SPI1_Init();
   MX_USART3_UART_Init();
+  uart3_ready = 1U;
+  UART_SendLine("UART3 ready\r\n");
+  UART_SendLine("I3C init start\r\n");
   MX_I3C1_Init();
+  UART_SendLine("I3C init OK\r\n");
   /* USER CODE BEGIN 2 */
-  ICM42670_STM32_SPIBus imu_spi_bus = {0};
+  ICM42670_STM32_I3CBus imu_i3c_bus = {0};
   ICM42670_Config imu_config = {
       // .accel_odr = 0,
       .accel_fs = ICM42670_ACCEL_FS_4G,
@@ -362,18 +414,20 @@ int main(void)
   ICM42670_ApexData_t apex_data = {0};
   ICM42670_Status_t apex_status = ICM42670_ERROR;
 
-  if (ICM42670_STM32_SPI_INIT(
-
-          &imu_config, &imu_spi_bus, &hspi1, ICM42670_SPI_CS_GPIO_Port,
-          ICM42670_SPI_CS_Pin
-
-          ) != ICM42670_OK) {
-    UART_SendLine("ICM42670 STM32 SPI setup failed\r\n");
+  if (ICM42670_AssignI3CDynamicAddress(
+          &hi3c1, ICM42670_I3C_TARGET_DYNAMIC_ADDR) != ICM42670_OK) {
+    UART_SendLine("ICM42670 I3C dynamic address assignment failed\r\n");
+  } else if (ICM42670_STM32_I3C_INIT(
+                 &imu_config, &imu_i3c_bus, &hi3c1,
+                 ICM42670_I3C_TARGET_DYNAMIC_ADDR) != ICM42670_OK) {
+    UART_SendLine("ICM42670 STM32 I3C setup failed\r\n");
   } else {
     HAL_Delay(10);
+    UART_SendLine("WHO_AM_I read start\r\n");
 
     if (imu_config.read_reg(imu_config.handle, ICM42670_REG_WHO_AM_I, &who_am_i,
                             1U) == ICM42670_OK) {
+      UART_SendLine("WHO_AM_I read OK\r\n");
       UART_SendWhoAmI(who_am_i);
     } else {
       UART_SendLine("WHO_AM_I read transaction failed\r\n");
@@ -426,7 +480,7 @@ int main(void)
       }
     }
 
-    HAL_Delay(200);
+    HAL_Delay(10);
 
     /* USER CODE END WHILE */
 
@@ -584,54 +638,6 @@ static void MX_ICACHE_Init(void)
 }
 
 /**
-  * @brief SPI1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SPI1_Init(void)
-{
-
-  /* USER CODE BEGIN SPI1_Init 0 */
-
-  /* USER CODE END SPI1_Init 0 */
-
-  /* USER CODE BEGIN SPI1_Init 1 */
-
-  /* USER CODE END SPI1_Init 1 */
-  /* SPI1 parameter configuration*/
-  hspi1.Instance = SPI1;
-  hspi1.Init.Mode = SPI_MODE_MASTER;
-  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
-  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi1.Init.CRCPolynomial = 0x7;
-  hspi1.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
-  hspi1.Init.NSSPolarity = SPI_NSS_POLARITY_LOW;
-  hspi1.Init.FifoThreshold = SPI_FIFO_THRESHOLD_01DATA;
-  hspi1.Init.MasterSSIdleness = SPI_MASTER_SS_IDLENESS_00CYCLE;
-  hspi1.Init.MasterInterDataIdleness = SPI_MASTER_INTERDATA_IDLENESS_00CYCLE;
-  hspi1.Init.MasterReceiverAutoSusp = SPI_MASTER_RX_AUTOSUSP_DISABLE;
-  hspi1.Init.MasterKeepIOState = SPI_MASTER_KEEP_IO_STATE_DISABLE;
-  hspi1.Init.IOSwap = SPI_IO_SWAP_DISABLE;
-  hspi1.Init.ReadyMasterManagement = SPI_RDY_MASTER_MANAGEMENT_INTERNALLY;
-  hspi1.Init.ReadyPolarity = SPI_RDY_POLARITY_HIGH;
-  if (HAL_SPI_Init(&hspi1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN SPI1_Init 2 */
-
-  /* USER CODE END SPI1_Init 2 */
-
-}
-
-/**
   * @brief USART3 Initialization Function
   * @param None
   * @retval None
@@ -744,6 +750,9 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
+  if (uart3_ready != 0U) {
+    UART_SendLine("ERROR: Error_Handler entered\r\n");
+  }
   __disable_irq();
   while (1) {
   }
