@@ -8,13 +8,13 @@ After there should be more complex configurations if you need them for example: 
 
 ~~1. Enable abstract or function pointers for platform agnostic use~~ 
 
-    1.1 Expose I2C, SPI and Optionally I3C 
+~~1.1 Expose I2C, SPI and Optionally I3C~~
 
-2. Configure Power Modes 
+~~2. Configure Power Modes~~ 
 
-    2.1 Configure Full Scale Range for Gyro And Accel 
+~~2.1 Configure Full Scale Range for Gyro And Accel~~ 
 
-    2.2 Configure ODR Output Data Rates 
+~~2.2 Configure ODR Output Data Rates~~ 
 
     2.3 Configure LOW PASS FILTERS (Not MAJOR)
 
