@@ -163,6 +163,18 @@ ICM42670_Status_t ICM42670_Init(ICM42670_Config *config);
 ICM42670_Status_t ICM42670_SetPowerState(ICM42670_Config *config,
                                          ICM42670_PowerState_t state);
 
+ICM42670_Status_t ICM42670_SetAccelRange(ICM42670_Config *config,
+                                         ICM42670_AccelFS_t accel_fs);
+
+ICM42670_Status_t ICM42670_SetGyroRange(ICM42670_Config *config,
+                                        ICM42670_GyroFS_t gyro_fs);
+
+ICM42670_Status_t ICM42670_SetAccelOdr(ICM42670_Config *config,
+                                       ICM42670_Odr_t odr);
+
+ICM42670_Status_t ICM42670_SetGyroOdr(ICM42670_Config *config,
+                                      ICM42670_Odr_t odr);
+
 ICM42670_Status_t ICM42670_ReadAccelRaw(const ICM42670_Config *config,
                                         int16_t accel_raw[3]);
 
