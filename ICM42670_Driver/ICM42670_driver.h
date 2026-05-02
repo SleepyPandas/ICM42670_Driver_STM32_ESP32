@@ -74,6 +74,17 @@ typedef enum {
 } ICM42670_Odr_t;
 
 typedef enum {
+  ICM42670_LPF_BYPASSED = 0x00U,
+  ICM42670_LPF_180_HZ = 0x01U,
+  ICM42670_LPF_121_HZ = 0x02U,
+  ICM42670_LPF_73_HZ = 0x03U,
+  ICM42670_LPF_53_HZ = 0x04U,
+  ICM42670_LPF_34_HZ = 0x05U,
+  ICM42670_LPF_25_HZ = 0x06U,
+  ICM42670_LPF_16_HZ = 0x07U,
+} ICM42670_Lpf_t;
+
+typedef enum {
   /**
    * @brief Sleep mode: gyro off, accel off.
    *
@@ -174,6 +185,12 @@ ICM42670_Status_t ICM42670_SetAccelOdr(ICM42670_Config *config,
 
 ICM42670_Status_t ICM42670_SetGyroOdr(ICM42670_Config *config,
                                       ICM42670_Odr_t odr);
+
+ICM42670_Status_t ICM42670_SetAccelLpf(ICM42670_Config *config,
+                                       ICM42670_Lpf_t lpf);
+
+ICM42670_Status_t ICM42670_SetGyroLpf(ICM42670_Config *config,
+                                      ICM42670_Lpf_t lpf);
 
 ICM42670_Status_t ICM42670_ReadAccelRaw(const ICM42670_Config *config,
                                         int16_t accel_raw[3]);
