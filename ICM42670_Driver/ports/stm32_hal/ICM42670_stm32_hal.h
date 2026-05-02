@@ -32,6 +32,7 @@ int8_t ICM42670_STM32_SPI_ReadReg(void *handle, uint8_t reg_addr, uint8_t *data,
 int8_t ICM42670_STM32_SPI_WriteReg(void *handle, uint8_t reg_addr,
                                    const uint8_t *data, uint16_t len);
 
+#ifdef HAL_I2C_MODULE_ENABLED
 typedef struct {
   I2C_HandleTypeDef *hi2c;
   // 7-bit I2C address, for example 0x68 or 0x69.
@@ -49,6 +50,27 @@ int8_t ICM42670_STM32_I2C_ReadReg(void *handle, uint8_t reg_addr, uint8_t *data,
 
 int8_t ICM42670_STM32_I2C_WriteReg(void *handle, uint8_t reg_addr,
                                    const uint8_t *data, uint16_t len);
+#endif /* HAL_I2C_MODULE_ENABLED */
+
+#ifdef HAL_I3C_MODULE_ENABLED
+typedef struct {
+  I3C_HandleTypeDef *hi3c;
+  // 7-bit I3C dynamic address assigned to the target.
+  uint8_t target_dynamic_addr;
+  uint32_t timeout_ms;
+} ICM42670_STM32_I3CBus;
+
+ICM42670_Status_t ICM42670_STM32_I3C_INIT(ICM42670_Config *config,
+                                          ICM42670_STM32_I3CBus *bus,
+                                          I3C_HandleTypeDef *hi3c,
+                                          uint8_t target_dynamic_addr);
+
+int8_t ICM42670_STM32_I3C_ReadReg(void *handle, uint8_t reg_addr, uint8_t *data,
+                                  uint16_t len);
+
+int8_t ICM42670_STM32_I3C_WriteReg(void *handle, uint8_t reg_addr,
+                                   const uint8_t *data, uint16_t len);
+#endif /* HAL_I3C_MODULE_ENABLED */
 
 #ifdef __cplusplus
 }

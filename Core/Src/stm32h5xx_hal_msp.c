@@ -119,6 +119,12 @@ void HAL_I3C_MspInit(I3C_HandleTypeDef* hi3c)
     GPIO_InitStruct.Alternate = GPIO_AF3_I3C1;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+    /* I3C1 interrupt Init */
+    HAL_NVIC_SetPriority(I3C1_EV_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(I3C1_EV_IRQn);
+    HAL_NVIC_SetPriority(I3C1_ER_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(I3C1_ER_IRQn);
+
     /* USER CODE BEGIN I3C1_MspInit 1 */
 
     /* USER CODE END I3C1_MspInit 1 */
@@ -148,6 +154,10 @@ void HAL_I3C_MspDeInit(I3C_HandleTypeDef* hi3c)
     PB7     ------> I3C1_SDA
     */
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6|GPIO_PIN_7);
+
+    /* I3C1 interrupt DeInit */
+    HAL_NVIC_DisableIRQ(I3C1_EV_IRQn);
+    HAL_NVIC_DisableIRQ(I3C1_ER_IRQn);
 
     /* USER CODE BEGIN I3C1_MspDeInit 1 */
 
