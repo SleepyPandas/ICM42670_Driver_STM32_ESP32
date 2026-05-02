@@ -7,12 +7,8 @@
  * @author Anthony / SleepPandas
  */
 
-#include "ICM42670_driver.h"
+#include "ICM42670_internal.h"
 #include <stdint.h>
-
-static int16_t ICM42670_CombineBytes(uint8_t msb, uint8_t lsb) {
-  return (int16_t)(((uint16_t)msb << 8U) | (uint16_t)lsb);
-}
 
 static ICM42670_AccelFS_t
 ICM42670_NormalizeAccelFs(ICM42670_AccelFS_t accel_fs) {
@@ -146,28 +142,6 @@ ICM42670_PowerStateToReg(ICM42670_PowerState_t state, uint8_t *pwr_mgmt0) {
   default:
     return ICM42670_ERROR;
   }
-}
-
-static ICM42670_Status_t ICM42670_UpdateRegBits(ICM42670_Config *config,
-                                                uint8_t reg_addr, uint8_t mask,
-                                                uint8_t field_value) {
-  uint8_t value = 0;
-
-  if ((config == 0) || (config->read_reg == 0) || (config->write_reg == 0)) {
-    return ICM42670_ERROR;
-  }
-
-  if (config->read_reg(config->handle, reg_addr, &value, 1) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  value = (uint8_t)((value & (uint8_t)~mask) | (field_value & mask));
-
-  if (config->write_reg(config->handle, reg_addr, &value, 1) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  return ICM42670_OK;
 }
 
 ICM42670_Status_t ICM42670_SetPowerState(ICM42670_Config *config,

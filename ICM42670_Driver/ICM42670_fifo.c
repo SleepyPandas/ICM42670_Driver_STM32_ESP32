@@ -4,159 +4,10 @@
  */
 
 #include "ICM42670_fifo.h"
+#include "ICM42670_internal.h"
 #include <stddef.h>
 
-#define ICM42670_FIFO_MREG_DELAY_MS 1U
 #define ICM42670_FIFO_FLUSH_DELAY_MS 1U
-
-static int16_t CombineBytes(uint8_t msb, uint8_t lsb) {
-  return (int16_t)(((uint16_t)msb << 8U) | (uint16_t)lsb);
-}
-
-static ICM42670_Status_t ValidateConfig(const ICM42670_Config *config) {
-  if ((config == NULL) || (config->read_reg == NULL) ||
-      (config->write_reg == NULL)) {
-    return ICM42670_ERROR;
-  }
-
-  return ICM42670_OK;
-}
-
-static ICM42670_Status_t ValidateMregConfig(const ICM42670_Config *config) {
-  if ((ValidateConfig(config) != ICM42670_OK) || (config->delay_ms == NULL)) {
-    return ICM42670_ERROR;
-  }
-
-  return ICM42670_OK;
-}
-
-static ICM42670_Status_t ReadReg(const ICM42670_Config *config,
-                                 uint8_t reg_addr, uint8_t *data,
-                                 uint16_t len) {
-  if ((ValidateConfig(config) != ICM42670_OK) || (data == NULL) ||
-      (len == 0U)) {
-    return ICM42670_ERROR;
-  }
-
-  return (config->read_reg(config->handle, reg_addr, data, len) ==
-          ICM42670_OK)
-             ? ICM42670_OK
-             : ICM42670_ERROR;
-}
-
-static ICM42670_Status_t WriteReg(const ICM42670_Config *config,
-                                  uint8_t reg_addr, uint8_t value) {
-  if (ValidateConfig(config) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  return (config->write_reg(config->handle, reg_addr, &value, 1U) ==
-          ICM42670_OK)
-             ? ICM42670_OK
-             : ICM42670_ERROR;
-}
-
-static ICM42670_Status_t UpdateRegBits(const ICM42670_Config *config,
-                                       uint8_t reg_addr, uint8_t mask,
-                                       uint8_t field_value) {
-  uint8_t value = 0U;
-
-  if (ReadReg(config, reg_addr, &value, 1U) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  value = (uint8_t)((value & (uint8_t)~mask) | (field_value & mask));
-  return WriteReg(config, reg_addr, value);
-}
-
-static ICM42670_Status_t WaitForMclk(const ICM42670_Config *config) {
-  uint8_t mclk_status = 0U;
-
-  if (ValidateMregConfig(config) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  if (ReadReg(config, ICM42670_REG_MCLK_RDY, &mclk_status, 1U) !=
-      ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  return ((mclk_status & ICM42670_MCLK_RDY_MASK) != 0U) ? ICM42670_OK
-                                                        : ICM42670_BUSY;
-}
-
-static ICM42670_Status_t ReadMreg1(const ICM42670_Config *config,
-                                   uint8_t reg_addr, uint8_t *value) {
-  ICM42670_Status_t status;
-
-  if (value == NULL) {
-    return ICM42670_ERROR;
-  }
-
-  status = WaitForMclk(config);
-  if (status != ICM42670_OK) {
-    return status;
-  }
-
-  if (WriteReg(config, ICM42670_REG_BLK_SEL_R, ICM42670_MREG1) !=
-      ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  if (WriteReg(config, ICM42670_REG_MADDR_R, reg_addr) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  config->delay_ms(ICM42670_FIFO_MREG_DELAY_MS);
-
-  if (ReadReg(config, ICM42670_REG_M_R, value, 1U) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  config->delay_ms(ICM42670_FIFO_MREG_DELAY_MS);
-  return ICM42670_OK;
-}
-
-static ICM42670_Status_t WriteMreg1(const ICM42670_Config *config,
-                                    uint8_t reg_addr, uint8_t value) {
-  ICM42670_Status_t status;
-
-  status = WaitForMclk(config);
-  if (status != ICM42670_OK) {
-    return status;
-  }
-
-  if (WriteReg(config, ICM42670_REG_BLK_SEL_W, ICM42670_MREG1) !=
-      ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  if (WriteReg(config, ICM42670_REG_MADDR_W, reg_addr) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  if (WriteReg(config, ICM42670_REG_M_W, value) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  config->delay_ms(ICM42670_FIFO_MREG_DELAY_MS);
-  return ICM42670_OK;
-}
-
-static ICM42670_Status_t UpdateMreg1Bits(const ICM42670_Config *config,
-                                         uint8_t reg_addr, uint8_t mask,
-                                         uint8_t field_value) {
-  uint8_t value = 0U;
-  ICM42670_Status_t status;
-
-  status = ReadMreg1(config, reg_addr, &value);
-  if (status != ICM42670_OK) {
-    return status;
-  }
-
-  value = (uint8_t)((value & (uint8_t)~mask) | (field_value & mask));
-  return WriteMreg1(config, reg_addr, value);
-}
 
 static ICM42670_Status_t ReadFifoCount(const ICM42670_Config *config,
                                        uint16_t *fifo_count) {
@@ -167,12 +18,12 @@ static ICM42670_Status_t ReadFifoCount(const ICM42670_Config *config,
     return ICM42670_ERROR;
   }
 
-  if (ReadReg(config, ICM42670_REG_FIFO_COUNTL, &count_low, 1U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_FIFO_COUNTL, &count_low, 1U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
 
-  if (ReadReg(config, ICM42670_REG_FIFO_COUNTH, &count_high, 1U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_FIFO_COUNTH, &count_high, 1U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
@@ -236,9 +87,12 @@ static ICM42670_Status_t ParseFifoPacket(uint8_t header, const uint8_t *data,
     }
 
     packet->has_accel = 1U;
-    packet->accel_raw[0] = CombineBytes(data[offset], data[offset + 1U]);
-    packet->accel_raw[1] = CombineBytes(data[offset + 2U], data[offset + 3U]);
-    packet->accel_raw[2] = CombineBytes(data[offset + 4U], data[offset + 5U]);
+    packet->accel_raw[0] =
+        ICM42670_CombineBytes(data[offset], data[offset + 1U]);
+    packet->accel_raw[1] =
+        ICM42670_CombineBytes(data[offset + 2U], data[offset + 3U]);
+    packet->accel_raw[2] =
+        ICM42670_CombineBytes(data[offset + 4U], data[offset + 5U]);
     offset = (uint8_t)(offset + ICM42670_ACCEL_DATA_LEN);
   }
 
@@ -248,9 +102,12 @@ static ICM42670_Status_t ParseFifoPacket(uint8_t header, const uint8_t *data,
     }
 
     packet->has_gyro = 1U;
-    packet->gyro_raw[0] = CombineBytes(data[offset], data[offset + 1U]);
-    packet->gyro_raw[1] = CombineBytes(data[offset + 2U], data[offset + 3U]);
-    packet->gyro_raw[2] = CombineBytes(data[offset + 4U], data[offset + 5U]);
+    packet->gyro_raw[0] =
+        ICM42670_CombineBytes(data[offset], data[offset + 1U]);
+    packet->gyro_raw[1] =
+        ICM42670_CombineBytes(data[offset + 2U], data[offset + 3U]);
+    packet->gyro_raw[2] =
+        ICM42670_CombineBytes(data[offset + 4U], data[offset + 5U]);
     offset = (uint8_t)(offset + ICM42670_GYRO_DATA_LEN);
   }
 
@@ -277,7 +134,7 @@ static ICM42670_Status_t SetIntPinDefaultIfUnset(
   uint8_t pin_mask = 0U;
   uint8_t pin_default = 0U;
 
-  if (ReadReg(config, ICM42670_REG_INT_CONFIG, &int_config, 1U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_INT_CONFIG, &int_config, 1U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
@@ -306,23 +163,24 @@ static ICM42670_Status_t SetIntPinDefaultIfUnset(
   }
 
   int_config = (uint8_t)(int_config | pin_default);
-  return WriteReg(config, ICM42670_REG_INT_CONFIG, int_config);
+  return ICM42670_WriteReg8(config, ICM42670_REG_INT_CONFIG, int_config);
 }
 
 ICM42670_Status_t ICM42670_FIFO_Init(const ICM42670_Config *config) {
   ICM42670_Status_t status;
 
-  if (ValidateMregConfig(config) != ICM42670_OK) {
+  if (ICM42670_ValidateMregConfig(config) != ICM42670_OK) {
     return ICM42670_ERROR;
   }
 
-  status = UpdateMreg1Bits(config, ICM42670_MREG1_REG_FIFO_CONFIG5,
-                           (uint8_t)(ICM42670_FIFO_CONFIG5_HIRES_EN |
-                                     ICM42670_FIFO_CONFIG5_TMST_FSYNC_EN |
-                                     ICM42670_FIFO_CONFIG5_GYRO_EN |
-                                     ICM42670_FIFO_CONFIG5_ACCEL_EN |
-                                     ICM42670_FIFO_CONFIG5_RESUME_PARTIAL_RD),
-                           0U);
+  status = ICM42670_UpdateMreg1Bits(
+      config, ICM42670_MREG1_REG_FIFO_CONFIG5,
+      (uint8_t)(ICM42670_FIFO_CONFIG5_HIRES_EN |
+                ICM42670_FIFO_CONFIG5_TMST_FSYNC_EN |
+                ICM42670_FIFO_CONFIG5_GYRO_EN |
+                ICM42670_FIFO_CONFIG5_ACCEL_EN |
+                ICM42670_FIFO_CONFIG5_RESUME_PARTIAL_RD),
+      0U);
   if (status != ICM42670_OK) {
     return status;
   }
@@ -338,38 +196,42 @@ ICM42670_Status_t ICM42670_FIFO_Init(const ICM42670_Config *config) {
     return status;
   }
 
-  status = UpdateRegBits(config, ICM42670_REG_INTF_CONFIG0,
-                         ICM42670_INTF_CONFIG0_FIFO_COUNT_FORMAT_MASK,
-                         ICM42670_INTF_CONFIG0_FIFO_COUNT_FORMAT_BYTES);
+  status = ICM42670_UpdateRegBits(
+      config, ICM42670_REG_INTF_CONFIG0,
+      ICM42670_INTF_CONFIG0_FIFO_COUNT_FORMAT_MASK,
+      ICM42670_INTF_CONFIG0_FIFO_COUNT_FORMAT_BYTES);
   if (status != ICM42670_OK) {
     return status;
   }
 
-  status = UpdateRegBits(config, ICM42670_REG_FIFO_CONFIG1,
-                         (uint8_t)(ICM42670_FIFO_CONFIG1_MODE_MASK |
-                                   ICM42670_FIFO_CONFIG1_BYPASS_MASK),
-                         (uint8_t)(ICM42670_FIFO_CONFIG1_MODE_STREAM |
-                                   ICM42670_FIFO_CONFIG1_BYPASS_DISABLE));
+  status = ICM42670_UpdateRegBits(
+      config, ICM42670_REG_FIFO_CONFIG1,
+      (uint8_t)(ICM42670_FIFO_CONFIG1_MODE_MASK |
+                ICM42670_FIFO_CONFIG1_BYPASS_MASK),
+      (uint8_t)(ICM42670_FIFO_CONFIG1_MODE_STREAM |
+                ICM42670_FIFO_CONFIG1_BYPASS_DISABLE));
   if (status != ICM42670_OK) {
     return status;
   }
 
-  status = UpdateMreg1Bits(config, ICM42670_MREG1_REG_FIFO_CONFIG6,
-                           (uint8_t)(ICM42670_FIFO_CONFIG6_EMPTY_INDICATOR_DIS |
-                                     ICM42670_FIFO_CONFIG6_RCOSC_REQ_ON_FIFO_THS_DIS),
-                           0U);
+  status = ICM42670_UpdateMreg1Bits(
+      config, ICM42670_MREG1_REG_FIFO_CONFIG6,
+      (uint8_t)(ICM42670_FIFO_CONFIG6_EMPTY_INDICATOR_DIS |
+                ICM42670_FIFO_CONFIG6_RCOSC_REQ_ON_FIFO_THS_DIS),
+      0U);
   if (status != ICM42670_OK) {
     return status;
   }
 
-  status = UpdateMreg1Bits(config, ICM42670_MREG1_REG_FIFO_CONFIG5,
-                           (uint8_t)(ICM42670_FIFO_CONFIG5_HIRES_EN |
-                                     ICM42670_FIFO_CONFIG5_TMST_FSYNC_EN |
-                                     ICM42670_FIFO_CONFIG5_GYRO_EN |
-                                     ICM42670_FIFO_CONFIG5_ACCEL_EN |
-                                     ICM42670_FIFO_CONFIG5_RESUME_PARTIAL_RD),
-                           (uint8_t)(ICM42670_FIFO_CONFIG5_GYRO_EN |
-                                     ICM42670_FIFO_CONFIG5_ACCEL_EN));
+  status = ICM42670_UpdateMreg1Bits(
+      config, ICM42670_MREG1_REG_FIFO_CONFIG5,
+      (uint8_t)(ICM42670_FIFO_CONFIG5_HIRES_EN |
+                ICM42670_FIFO_CONFIG5_TMST_FSYNC_EN |
+                ICM42670_FIFO_CONFIG5_GYRO_EN |
+                ICM42670_FIFO_CONFIG5_ACCEL_EN |
+                ICM42670_FIFO_CONFIG5_RESUME_PARTIAL_RD),
+      (uint8_t)(ICM42670_FIFO_CONFIG5_GYRO_EN |
+                ICM42670_FIFO_CONFIG5_ACCEL_EN));
   if (status != ICM42670_OK) {
     return status;
   }
@@ -381,25 +243,26 @@ ICM42670_Status_t
 ICM42670_FIFO_UseFullBuffer(const ICM42670_Config *config) {
   ICM42670_Status_t status;
 
-  if (ValidateMregConfig(config) != ICM42670_OK) {
+  if (ICM42670_ValidateMregConfig(config) != ICM42670_OK) {
     return ICM42670_ERROR;
   }
 
-  status = UpdateRegBits(config, ICM42670_REG_APEX_CONFIG1,
-                         ICM42670_APEX_CONFIG1_FEATURE_ENABLE_MASK, 0U);
+  status = ICM42670_UpdateRegBits(
+      config, ICM42670_REG_APEX_CONFIG1,
+      ICM42670_APEX_CONFIG1_FEATURE_ENABLE_MASK, 0U);
   if (status != ICM42670_OK) {
     return status;
   }
 
-  status = UpdateRegBits(config, ICM42670_REG_WOM_CONFIG,
-                         ICM42670_WOM_CONFIG_WOM_EN, 0U);
+  status = ICM42670_UpdateRegBits(config, ICM42670_REG_WOM_CONFIG,
+                                  ICM42670_WOM_CONFIG_WOM_EN, 0U);
   if (status != ICM42670_OK) {
     return status;
   }
 
-  return UpdateMreg1Bits(config, ICM42670_MREG1_REG_SENSOR_CONFIG3,
-                         ICM42670_SENSOR_CONFIG3_APEX_DISABLE,
-                         ICM42670_SENSOR_CONFIG3_APEX_DISABLE);
+  return ICM42670_UpdateMreg1Bits(config, ICM42670_MREG1_REG_SENSOR_CONFIG3,
+                                  ICM42670_SENSOR_CONFIG3_APEX_DISABLE,
+                                  ICM42670_SENSOR_CONFIG3_APEX_DISABLE);
 }
 
 ICM42670_Status_t ICM42670_FIFO_SetWatermark(const ICM42670_Config *config,
@@ -407,7 +270,7 @@ ICM42670_Status_t ICM42670_FIFO_SetWatermark(const ICM42670_Config *config,
   uint8_t watermark_low = 0U;
   uint8_t watermark_high = 0U;
 
-  if (ValidateConfig(config) != ICM42670_OK) {
+  if (ICM42670_ValidateConfig(config) != ICM42670_OK) {
     return ICM42670_ERROR;
   }
 
@@ -420,21 +283,23 @@ ICM42670_Status_t ICM42670_FIFO_SetWatermark(const ICM42670_Config *config,
   watermark_high = (uint8_t)((watermark_bytes >> 8U) &
                              ICM42670_FIFO_CONFIG3_WM_HIGH_MASK);
 
-  if (WriteReg(config, ICM42670_REG_FIFO_CONFIG2, watermark_low) !=
+  if (ICM42670_WriteReg8(config, ICM42670_REG_FIFO_CONFIG2, watermark_low) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
 
-  return WriteReg(config, ICM42670_REG_FIFO_CONFIG3, watermark_high);
+  return ICM42670_WriteReg8(config, ICM42670_REG_FIFO_CONFIG3,
+                            watermark_high);
 }
 
 ICM42670_Status_t ICM42670_FIFO_Flush(const ICM42670_Config *config) {
-  if ((ValidateConfig(config) != ICM42670_OK) || (config->delay_ms == NULL)) {
+  if ((ICM42670_ValidateConfig(config) != ICM42670_OK) ||
+      (config->delay_ms == NULL)) {
     return ICM42670_ERROR;
   }
 
-  if (WriteReg(config, ICM42670_REG_SIGNAL_PATH_RESET,
-               ICM42670_SIGNAL_PATH_FIFO_FLUSH) != ICM42670_OK) {
+  if (ICM42670_WriteReg8(config, ICM42670_REG_SIGNAL_PATH_RESET,
+                         ICM42670_SIGNAL_PATH_FIFO_FLUSH) != ICM42670_OK) {
     return ICM42670_ERROR;
   }
 
@@ -449,8 +314,8 @@ ICM42670_Status_t ICM42670_FIFO_Read(const ICM42670_Config *config,
   uint16_t fifo_count = 0U;
   uint16_t parsed_count = 0U;
 
-  if ((ValidateConfig(config) != ICM42670_OK) || (packets_read == NULL) ||
-      ((packets == NULL) && (max_packets > 0U))) {
+  if ((ICM42670_ValidateConfig(config) != ICM42670_OK) ||
+      (packets_read == NULL) || ((packets == NULL) && (max_packets > 0U))) {
     return ICM42670_ERROR;
   }
 
@@ -470,7 +335,7 @@ ICM42670_Status_t ICM42670_FIFO_Read(const ICM42670_Config *config,
     uint8_t payload_len = 0U;
     uint8_t payload[ICM42670_FIFO_DEFAULT_PACKET_BYTES - 1U] = {0U};
 
-    if (ReadReg(config, ICM42670_REG_FIFO_DATA, &header, 1U) !=
+    if (ICM42670_ReadReg(config, ICM42670_REG_FIFO_DATA, &header, 1U) !=
         ICM42670_OK) {
       return ICM42670_ERROR;
     }
@@ -489,7 +354,8 @@ ICM42670_Status_t ICM42670_FIFO_Read(const ICM42670_Config *config,
     }
 
     payload_len = (uint8_t)(packet_size - 1U);
-    if (ReadReg(config, ICM42670_REG_FIFO_DATA, payload, payload_len) !=
+    if (ICM42670_ReadReg(config, ICM42670_REG_FIFO_DATA, payload,
+                         payload_len) !=
         ICM42670_OK) {
       return ICM42670_ERROR;
     }
@@ -516,7 +382,7 @@ ICM42670_FIFO_RouteInterrupt(const ICM42670_Config *config,
   const uint8_t fifo_int_mask =
       (uint8_t)(ICM42670_FIFO_INT_THRESHOLD | ICM42670_FIFO_INT_FULL);
 
-  if (ValidateConfig(config) != ICM42670_OK) {
+  if (ICM42670_ValidateConfig(config) != ICM42670_OK) {
     return ICM42670_ERROR;
   }
 
@@ -539,5 +405,5 @@ ICM42670_FIFO_RouteInterrupt(const ICM42670_Config *config,
     return ICM42670_ERROR;
   }
 
-  return UpdateRegBits(config, reg_addr, fifo_int_mask, source_bits);
+  return ICM42670_UpdateRegBits(config, reg_addr, fifo_int_mask, source_bits);
 }

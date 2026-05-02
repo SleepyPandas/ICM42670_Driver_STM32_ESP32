@@ -7,16 +7,15 @@
  */
 
 #include "ICM42670_apex.h"
+#include "ICM42670_internal.h"
 #include <stddef.h>
 
-#define ICM42670_APEX_MREG_DELAY_MS 1U
 #define ICM42670_APEX_MEM_RESET_DELAY_MS 1U
 #define ICM42670_APEX_INIT_DELAY_MS 50U
 
 #define ICM42670_REG_APEX_DATA4 0x1DU
 #define ICM42670_REG_APEX_DATA0 0x31U
 
-#define ICM42670_MREG1 0x00U
 #define ICM42670_MREG1_APEX_CONFIG3 0x45U
 #define ICM42670_MREG1_APEX_CONFIG5 0x47U
 #define ICM42670_MREG1_APEX_CONFIG9 0x48U
@@ -85,150 +84,6 @@ static const uint16_t ICM42670_FreeFallDebounceMs[] = {
     0U,    1250U, 1375U, 1500U, 1625U, 1750U, 1875U, 2000U,
     2125U, 2250U, 2375U, 2500U, 2625U, 2750U, 2875U, 3000U};
 
-static ICM42670_Status_t ValidateConfig(const ICM42670_Config *config) {
-  if ((config == NULL) || (config->read_reg == NULL) ||
-      (config->write_reg == NULL)) {
-    return ICM42670_ERROR;
-  }
-
-  return ICM42670_OK;
-}
-
-static ICM42670_Status_t ValidateMregConfig(const ICM42670_Config *config) {
-  if ((ValidateConfig(config) != ICM42670_OK) || (config->delay_ms == NULL)) {
-    return ICM42670_ERROR;
-  }
-
-  return ICM42670_OK;
-}
-
-static ICM42670_Status_t ReadReg(const ICM42670_Config *config,
-                                 uint8_t reg_addr, uint8_t *data,
-                                 uint16_t len) {
-  if ((ValidateConfig(config) != ICM42670_OK) || (data == NULL) ||
-      (len == 0U)) {
-    return ICM42670_ERROR;
-  }
-
-  return (config->read_reg(config->handle, reg_addr, data, len) == ICM42670_OK)
-             ? ICM42670_OK
-             : ICM42670_ERROR;
-}
-
-static ICM42670_Status_t WriteReg(const ICM42670_Config *config,
-                                  uint8_t reg_addr, uint8_t value) {
-  if (ValidateConfig(config) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  return (config->write_reg(config->handle, reg_addr, &value, 1U) ==
-          ICM42670_OK)
-             ? ICM42670_OK
-             : ICM42670_ERROR;
-}
-
-static ICM42670_Status_t UpdateRegBits(const ICM42670_Config *config,
-                                       uint8_t reg_addr, uint8_t mask,
-                                       uint8_t field_value) {
-  uint8_t value = 0U;
-
-  if (ReadReg(config, reg_addr, &value, 1U) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  value = (uint8_t)((value & (uint8_t)~mask) | (field_value & mask));
-  return WriteReg(config, reg_addr, value);
-}
-
-static ICM42670_Status_t WaitForMclk(const ICM42670_Config *config) {
-  uint8_t mclk_status = 0U;
-
-  if (ValidateMregConfig(config) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  if (ReadReg(config, ICM42670_REG_MCLK_RDY, &mclk_status, 1U) !=
-      ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  return ((mclk_status & ICM42670_MCLK_RDY_MASK) != 0U) ? ICM42670_OK
-                                                        : ICM42670_BUSY;
-}
-
-static ICM42670_Status_t ReadMreg1(const ICM42670_Config *config,
-                                   uint8_t reg_addr, uint8_t *value) {
-  ICM42670_Status_t status;
-
-  if (value == NULL) {
-    return ICM42670_ERROR;
-  }
-
-  status = WaitForMclk(config);
-  if (status != ICM42670_OK) {
-    return status;
-  }
-
-  if (WriteReg(config, ICM42670_REG_BLK_SEL_R, ICM42670_MREG1) !=
-      ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  if (WriteReg(config, ICM42670_REG_MADDR_R, reg_addr) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  config->delay_ms(ICM42670_APEX_MREG_DELAY_MS);
-
-  if (ReadReg(config, ICM42670_REG_M_R, value, 1U) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  config->delay_ms(ICM42670_APEX_MREG_DELAY_MS);
-  return ICM42670_OK;
-}
-
-static ICM42670_Status_t WriteMreg1(const ICM42670_Config *config,
-                                    uint8_t reg_addr, uint8_t value) {
-  ICM42670_Status_t status;
-
-  status = WaitForMclk(config);
-  if (status != ICM42670_OK) {
-    return status;
-  }
-
-  if (WriteReg(config, ICM42670_REG_BLK_SEL_W, ICM42670_MREG1) !=
-      ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  if (WriteReg(config, ICM42670_REG_MADDR_W, reg_addr) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  if (WriteReg(config, ICM42670_REG_M_W, value) != ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
-
-  config->delay_ms(ICM42670_APEX_MREG_DELAY_MS);
-  return ICM42670_OK;
-}
-
-static ICM42670_Status_t UpdateMreg1Bits(const ICM42670_Config *config,
-                                         uint8_t reg_addr, uint8_t mask,
-                                         uint8_t field_value) {
-  uint8_t value = 0U;
-  ICM42670_Status_t status;
-
-  status = ReadMreg1(config, reg_addr, &value);
-  if (status != ICM42670_OK) {
-    return status;
-  }
-
-  value = (uint8_t)((value & (uint8_t)~mask) | (field_value & mask));
-  return WriteMreg1(config, reg_addr, value);
-}
-
 static uint8_t SelectNearestIndex(const uint16_t *values, uint8_t count,
                                   uint16_t target) {
   uint8_t best_index = 0U;
@@ -272,7 +127,8 @@ static ICM42670_Status_t SetApexConfig1Feature(
     const ICM42670_Config *config, uint8_t mask, ICM42670_ApexState_t state) {
   uint8_t field_value = (state == ICM42670_APEX_ENABLE) ? mask : 0U;
 
-  return UpdateRegBits(config, ICM42670_REG_APEX_CONFIG1, mask, field_value);
+  return ICM42670_UpdateRegBits(config, ICM42670_REG_APEX_CONFIG1, mask,
+                                field_value);
 }
 
 static ICM42670_Status_t SetWomFeature(const ICM42670_Config *config,
@@ -280,8 +136,8 @@ static ICM42670_Status_t SetWomFeature(const ICM42670_Config *config,
   uint8_t field_value =
       (state == ICM42670_APEX_ENABLE) ? ICM42670_WOM_CONFIG_WOM_EN : 0U;
 
-  return UpdateRegBits(config, ICM42670_REG_WOM_CONFIG,
-                       ICM42670_WOM_CONFIG_WOM_EN, field_value);
+  return ICM42670_UpdateRegBits(config, ICM42670_REG_WOM_CONFIG,
+                                ICM42670_WOM_CONFIG_WOM_EN, field_value);
 }
 
 ICM42670_Status_t ICM42670_Init_Apex(const ICM42670_Config *config) {
@@ -294,49 +150,51 @@ ICM42670_Status_t ICM42670_Init_Apex(const ICM42670_Config *config) {
                 ICM42670_APEX_CONFIG1_DMP_ODR_MASK);
   ICM42670_Status_t status;
 
-  if (ValidateMregConfig(config) != ICM42670_OK) {
+  if (ICM42670_ValidateMregConfig(config) != ICM42670_OK) {
     return ICM42670_ERROR;
   }
 
-  status = UpdateRegBits(config, ICM42670_REG_APEX_CONFIG1,
-                         apex_config1_init_mask,
-                         ICM42670_APEX_CONFIG1_DMP_ODR_50HZ);
+  status = ICM42670_UpdateRegBits(config, ICM42670_REG_APEX_CONFIG1,
+                                  apex_config1_init_mask,
+                                  ICM42670_APEX_CONFIG1_DMP_ODR_50HZ);
   if (status != ICM42670_OK) {
     return status;
   }
 
-  status = UpdateRegBits(config, ICM42670_REG_APEX_CONFIG0,
-                         apex_config0_command_mask, 0U);
+  status = ICM42670_UpdateRegBits(config, ICM42670_REG_APEX_CONFIG0,
+                                  apex_config0_command_mask, 0U);
   if (status != ICM42670_OK) {
     return status;
   }
 
-  status = UpdateRegBits(config, ICM42670_REG_APEX_CONFIG0,
-                         ICM42670_APEX_CONFIG0_DMP_MEM_RESET_EN,
-                         ICM42670_APEX_CONFIG0_DMP_MEM_RESET_EN);
+  status = ICM42670_UpdateRegBits(
+      config, ICM42670_REG_APEX_CONFIG0,
+      ICM42670_APEX_CONFIG0_DMP_MEM_RESET_EN,
+      ICM42670_APEX_CONFIG0_DMP_MEM_RESET_EN);
   if (status != ICM42670_OK) {
     return status;
   }
 
   config->delay_ms(ICM42670_APEX_MEM_RESET_DELAY_MS);
 
-  status = UpdateRegBits(config, ICM42670_REG_APEX_CONFIG0,
-                         ICM42670_APEX_CONFIG0_DMP_MEM_RESET_EN, 0U);
+  status = ICM42670_UpdateRegBits(
+      config, ICM42670_REG_APEX_CONFIG0,
+      ICM42670_APEX_CONFIG0_DMP_MEM_RESET_EN, 0U);
   if (status != ICM42670_OK) {
     return status;
   }
 
-  status = UpdateRegBits(config, ICM42670_REG_APEX_CONFIG0,
-                         ICM42670_APEX_CONFIG0_DMP_INIT_EN,
-                         ICM42670_APEX_CONFIG0_DMP_INIT_EN);
+  status = ICM42670_UpdateRegBits(config, ICM42670_REG_APEX_CONFIG0,
+                                  ICM42670_APEX_CONFIG0_DMP_INIT_EN,
+                                  ICM42670_APEX_CONFIG0_DMP_INIT_EN);
   if (status != ICM42670_OK) {
     return status;
   }
 
   config->delay_ms(ICM42670_APEX_INIT_DELAY_MS);
 
-  return UpdateRegBits(config, ICM42670_REG_APEX_CONFIG0,
-                       ICM42670_APEX_CONFIG0_DMP_INIT_EN, 0U);
+  return ICM42670_UpdateRegBits(config, ICM42670_REG_APEX_CONFIG0,
+                                ICM42670_APEX_CONFIG0_DMP_INIT_EN, 0U);
 }
 
 ICM42670_Status_t
@@ -353,16 +211,17 @@ ICM42670_Enable_Pedo(const ICM42670_Config *config,
                         ? ICM42670_APEX_CONFIG9_PED_SLOW_WALK_MASK
                         : 0U;
 
-  status = UpdateMreg1Bits(config, ICM42670_MREG1_APEX_CONFIG9,
-                           ICM42670_APEX_CONFIG9_PED_SLOW_WALK_MASK,
-                           slow_walk_value);
+  status = ICM42670_UpdateMreg1Bits(
+      config, ICM42670_MREG1_APEX_CONFIG9,
+      ICM42670_APEX_CONFIG9_PED_SLOW_WALK_MASK, slow_walk_value);
   if (status != ICM42670_OK) {
     return status;
   }
 
-  status = UpdateMreg1Bits(config, ICM42670_MREG1_APEX_CONFIG3,
-                           ICM42670_APEX_CONFIG3_PED_STEP_CNT_TH_MASK,
-                           ICM42670_APEX_CONFIG3_PED_STEP_CNT_TH_ONE_STEP);
+  status = ICM42670_UpdateMreg1Bits(
+      config, ICM42670_MREG1_APEX_CONFIG3,
+      ICM42670_APEX_CONFIG3_PED_STEP_CNT_TH_MASK,
+      ICM42670_APEX_CONFIG3_PED_STEP_CNT_TH_ONE_STEP);
   if (status != ICM42670_OK) {
     return status;
   }
@@ -385,12 +244,12 @@ ICM42670_Status_t ICM42670_Read_Pedo(const ICM42670_Config *config,
     return ICM42670_ERROR;
   }
 
-  if (ReadReg(config, ICM42670_REG_APEX_DATA0, apex_data, 4U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_APEX_DATA0, apex_data, 4U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
 
-  if (ReadReg(config, ICM42670_REG_INT_STATUS3, &int_status3, 1U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_INT_STATUS3, &int_status3, 1U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
@@ -422,9 +281,9 @@ ICM42670_Enable_Tilt(const ICM42670_Config *config,
                                           sizeof(ICM42670_TiltWaitSeconds[0])),
       tilt_config->wait_time_s);
 
-  status = UpdateMreg1Bits(config, ICM42670_MREG1_APEX_CONFIG5,
-                           ICM42670_APEX_CONFIG5_TILT_WAIT_MASK,
-                           (uint8_t)(wait_sel << 6U));
+  status = ICM42670_UpdateMreg1Bits(
+      config, ICM42670_MREG1_APEX_CONFIG5,
+      ICM42670_APEX_CONFIG5_TILT_WAIT_MASK, (uint8_t)(wait_sel << 6U));
   if (status != ICM42670_OK) {
     return status;
   }
@@ -446,7 +305,7 @@ ICM42670_Status_t ICM42670_Read_Tilt(const ICM42670_Config *config,
     return ICM42670_ERROR;
   }
 
-  if (ReadReg(config, ICM42670_REG_INT_STATUS3, &int_status3, 1U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_INT_STATUS3, &int_status3, 1U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
@@ -475,8 +334,9 @@ ICM42670_Enable_Low_G(const ICM42670_Config *config,
   sample_sel = (uint8_t)(ClampU8(low_g_config->sample_count, 1U, 8U) - 1U);
   field_value = (uint8_t)((threshold_sel << 3U) | sample_sel);
 
-  status = UpdateMreg1Bits(config, ICM42670_MREG1_APEX_CONFIG10,
-                           ICM42670_APEX_CONFIG10_LOWG_MASK, field_value);
+  status = ICM42670_UpdateMreg1Bits(
+      config, ICM42670_MREG1_APEX_CONFIG10,
+      ICM42670_APEX_CONFIG10_LOWG_MASK, field_value);
   if (status != ICM42670_OK) {
     return status;
   }
@@ -499,7 +359,7 @@ ICM42670_Status_t ICM42670_Read_Low_G(const ICM42670_Config *config,
     return ICM42670_ERROR;
   }
 
-  if (ReadReg(config, ICM42670_REG_INT_STATUS3, &int_status3, 1U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_INT_STATUS3, &int_status3, 1U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
@@ -539,16 +399,17 @@ ICM42670_Status_t ICM42670_Enable_Free_Fall(
       free_fall_config->debounce_ms);
   duration_value = (uint8_t)((max_sel << 4U) | min_sel);
 
-  status = UpdateMreg1Bits(config, ICM42670_MREG1_APEX_CONFIG12,
-                           ICM42670_APEX_CONFIG12_FF_DURATION_MASK,
-                           duration_value);
+  status = ICM42670_UpdateMreg1Bits(
+      config, ICM42670_MREG1_APEX_CONFIG12,
+      ICM42670_APEX_CONFIG12_FF_DURATION_MASK, duration_value);
   if (status != ICM42670_OK) {
     return status;
   }
 
-  status = UpdateMreg1Bits(config, ICM42670_MREG1_APEX_CONFIG9,
-                           ICM42670_APEX_CONFIG9_FF_DEBOUNCE_MASK,
-                           (uint8_t)(debounce_sel << 4U));
+  status = ICM42670_UpdateMreg1Bits(
+      config, ICM42670_MREG1_APEX_CONFIG9,
+      ICM42670_APEX_CONFIG9_FF_DEBOUNCE_MASK,
+      (uint8_t)(debounce_sel << 4U));
   if (status != ICM42670_OK) {
     return status;
   }
@@ -571,12 +432,12 @@ ICM42670_Status_t ICM42670_Read_Free_Fall(
     return ICM42670_ERROR;
   }
 
-  if (ReadReg(config, ICM42670_REG_APEX_DATA4, apex_data, 2U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_APEX_DATA4, apex_data, 2U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
 
-  if (ReadReg(config, ICM42670_REG_INT_STATUS3, &int_status3, 1U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_INT_STATUS3, &int_status3, 1U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
@@ -598,23 +459,23 @@ ICM42670_Status_t ICM42670_Enable_Wake_On_Motion(
     return ICM42670_ERROR;
   }
 
-  status = WriteMreg1(config, ICM42670_MREG1_ACCEL_WOM_X_THR,
-                      ConvertWomThresholdMg(
-                          wake_on_motion_config->x_threshold_mg));
+  status = ICM42670_WriteMreg1(
+      config, ICM42670_MREG1_ACCEL_WOM_X_THR,
+      ConvertWomThresholdMg(wake_on_motion_config->x_threshold_mg));
   if (status != ICM42670_OK) {
     return status;
   }
 
-  status = WriteMreg1(config, ICM42670_MREG1_ACCEL_WOM_Y_THR,
-                      ConvertWomThresholdMg(
-                          wake_on_motion_config->y_threshold_mg));
+  status = ICM42670_WriteMreg1(
+      config, ICM42670_MREG1_ACCEL_WOM_Y_THR,
+      ConvertWomThresholdMg(wake_on_motion_config->y_threshold_mg));
   if (status != ICM42670_OK) {
     return status;
   }
 
-  status = WriteMreg1(config, ICM42670_MREG1_ACCEL_WOM_Z_THR,
-                      ConvertWomThresholdMg(
-                          wake_on_motion_config->z_threshold_mg));
+  status = ICM42670_WriteMreg1(
+      config, ICM42670_MREG1_ACCEL_WOM_Z_THR,
+      ConvertWomThresholdMg(wake_on_motion_config->z_threshold_mg));
   if (status != ICM42670_OK) {
     return status;
   }
@@ -636,7 +497,7 @@ ICM42670_Status_t ICM42670_Read_Wake_On_Motion(
     return ICM42670_ERROR;
   }
 
-  if (ReadReg(config, ICM42670_REG_INT_STATUS2, &int_status2, 1U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_INT_STATUS2, &int_status2, 1U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
@@ -663,9 +524,10 @@ ICM42670_Status_t ICM42670_Enable_Significant_Motion(
 
   sensitivity =
       ClampU8(significant_motion_config->sensitivity_level, 0U, 4U);
-  status = UpdateMreg1Bits(config, ICM42670_MREG1_APEX_CONFIG9,
-                           ICM42670_APEX_CONFIG9_SMD_SENSITIVITY_MASK,
-                           (uint8_t)(sensitivity << 1U));
+  status = ICM42670_UpdateMreg1Bits(
+      config, ICM42670_MREG1_APEX_CONFIG9,
+      ICM42670_APEX_CONFIG9_SMD_SENSITIVITY_MASK,
+      (uint8_t)(sensitivity << 1U));
   if (status != ICM42670_OK) {
     return status;
   }
@@ -689,7 +551,7 @@ ICM42670_Read_Significant_Motion(const ICM42670_Config *config,
     return ICM42670_ERROR;
   }
 
-  if (ReadReg(config, ICM42670_REG_INT_STATUS2, &int_status2, 1U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_INT_STATUS2, &int_status2, 1U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
@@ -710,22 +572,22 @@ ICM42670_Status_t ICM42670_Read_Apex(const ICM42670_Config *config,
     return ICM42670_ERROR;
   }
 
-  if (ReadReg(config, ICM42670_REG_APEX_DATA0, pedo_raw, 4U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_APEX_DATA0, pedo_raw, 4U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
 
-  if (ReadReg(config, ICM42670_REG_APEX_DATA4, free_fall_raw, 2U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_APEX_DATA4, free_fall_raw, 2U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
 
-  if (ReadReg(config, ICM42670_REG_INT_STATUS2, &int_status2, 1U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_INT_STATUS2, &int_status2, 1U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
 
-  if (ReadReg(config, ICM42670_REG_INT_STATUS3, &int_status3, 1U) !=
+  if (ICM42670_ReadReg(config, ICM42670_REG_INT_STATUS3, &int_status3, 1U) !=
       ICM42670_OK) {
     return ICM42670_ERROR;
   }
