@@ -132,6 +132,28 @@ ICM42670_PowerStateToReg(ICM42670_PowerState_t state, uint8_t *pwr_mgmt0) {
   }
 }
 
+static ICM42670_Status_t ICM42670_UpdateRegBits(ICM42670_Config *config,
+                                                uint8_t reg_addr, uint8_t mask,
+                                                uint8_t field_value) {
+  uint8_t value = 0;
+
+  if ((config == 0) || (config->read_reg == 0) || (config->write_reg == 0)) {
+    return ICM42670_ERROR;
+  }
+
+  if (config->read_reg(config->handle, reg_addr, &value, 1) != ICM42670_OK) {
+    return ICM42670_ERROR;
+  }
+
+  value = (uint8_t)((value & (uint8_t)~mask) | (field_value & mask));
+
+  if (config->write_reg(config->handle, reg_addr, &value, 1) != ICM42670_OK) {
+    return ICM42670_ERROR;
+  }
+
+  return ICM42670_OK;
+}
+
 ICM42670_Status_t ICM42670_SetPowerState(ICM42670_Config *config,
                                          ICM42670_PowerState_t state) {
   uint8_t pwr_mgmt0 = 0;
@@ -150,6 +172,62 @@ ICM42670_Status_t ICM42670_SetPowerState(ICM42670_Config *config,
   }
 
   config->delay_ms(1);
+  return ICM42670_OK;
+}
+
+ICM42670_Status_t ICM42670_SetAccelRange(ICM42670_Config *config,
+                                         ICM42670_AccelFS_t accel_fs) {
+  accel_fs = ICM42670_NormalizeAccelFs(accel_fs);
+
+  if (ICM42670_UpdateRegBits(config, ICM42670_REG_ACCEL_CONFIG0,
+                             ICM42670_ACCEL_CONFIG0_FS_SEL_MASK,
+                             (uint8_t)accel_fs) != ICM42670_OK) {
+    return ICM42670_ERROR;
+  }
+
+  config->accel_fs = accel_fs;
+  return ICM42670_OK;
+}
+
+ICM42670_Status_t ICM42670_SetGyroRange(ICM42670_Config *config,
+                                        ICM42670_GyroFS_t gyro_fs) {
+  gyro_fs = ICM42670_NormalizeGyroFs(gyro_fs);
+
+  if (ICM42670_UpdateRegBits(config, ICM42670_REG_GYRO_CONFIG0,
+                             ICM42670_GYRO_CONFIG0_FS_SEL_MASK,
+                             (uint8_t)gyro_fs) != ICM42670_OK) {
+    return ICM42670_ERROR;
+  }
+
+  config->gyro_fs = gyro_fs;
+  return ICM42670_OK;
+}
+
+ICM42670_Status_t ICM42670_SetAccelOdr(ICM42670_Config *config,
+                                       ICM42670_Odr_t odr) {
+  odr = ICM42670_NormalizeAccelOdr(odr);
+
+  if (ICM42670_UpdateRegBits(config, ICM42670_REG_ACCEL_CONFIG0,
+                             ICM42670_ACCEL_CONFIG0_ODR_MASK,
+                             (uint8_t)odr) != ICM42670_OK) {
+    return ICM42670_ERROR;
+  }
+
+  config->accel_odr = odr;
+  return ICM42670_OK;
+}
+
+ICM42670_Status_t ICM42670_SetGyroOdr(ICM42670_Config *config,
+                                      ICM42670_Odr_t odr) {
+  odr = ICM42670_NormalizeGyroOdr(odr);
+
+  if (ICM42670_UpdateRegBits(config, ICM42670_REG_GYRO_CONFIG0,
+                             ICM42670_GYRO_CONFIG0_ODR_MASK, (uint8_t)odr) !=
+      ICM42670_OK) {
+    return ICM42670_ERROR;
+  }
+
+  config->gyro_odr = odr;
   return ICM42670_OK;
 }
 
