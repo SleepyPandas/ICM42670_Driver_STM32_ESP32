@@ -47,6 +47,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
     ICM42670_Driver/ICM42670_driver.c
     ICM42670_Driver/ICM42670_apex.c
+    ICM42670_Driver/ICM42670_fifo.c
     ICM42670_Driver/ports/stm32_hal/ICM42670_stm32_hal.c
 )
 
