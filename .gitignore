@@ -1,10 +1,13 @@
-build
+# Build and output directories
+build/
+Debug/
+Release/
 mx.scratch
-!.settings
 
-# STM32 build output directories
-/Debug/
-/Release/
+# Log files
+*.log
+gdbClient_log.txt
+stlinkgdbserver_log.txt
 
 # STM32CubeMX / IDE artifacts
 *.cyclo
