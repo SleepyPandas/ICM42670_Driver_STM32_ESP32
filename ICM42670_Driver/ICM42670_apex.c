@@ -58,6 +58,8 @@
 #define ICM42670_APEX_CONFIG9_PED_SLOW_WALK_MASK 0x01U
 #define ICM42670_APEX_CONFIG10_LOWG_MASK 0xFFU
 #define ICM42670_APEX_CONFIG12_FF_DURATION_MASK 0xFFU
+#define ICM42670_APEX_PEDO_INVALID_BYTE 0xFFU
+#define ICM42670_APEX_PEDO_READ_ATTEMPTS 3U
 
 typedef enum {
   ICM42670_APEX_DISABLE = 0U,
@@ -121,6 +123,13 @@ static uint8_t ConvertWomThresholdMg(uint16_t threshold_mg) {
   uint32_t code = (((uint32_t)threshold_mg * 256UL) + 500UL) / 1000UL;
 
   return (code > 255UL) ? 255U : (uint8_t)code;
+}
+
+static uint8_t IsInvalidPedoFrame(const uint8_t apex_data[4]) {
+  return ((apex_data[2] == ICM42670_APEX_PEDO_INVALID_BYTE) &&
+          (apex_data[3] == ICM42670_APEX_PEDO_INVALID_BYTE))
+             ? 1U
+             : 0U;
 }
 
 static ICM42670_Status_t SetApexConfig1Feature(
@@ -244,14 +253,25 @@ ICM42670_Status_t ICM42670_Read_Pedo(const ICM42670_Config *config,
     return ICM42670_ERROR;
   }
 
-  if (ICM42670_ReadReg(config, ICM42670_REG_APEX_DATA0, apex_data, 4U) !=
-      ICM42670_OK) {
-    return ICM42670_ERROR;
-  }
+  for (uint8_t attempt = 0U; attempt < ICM42670_APEX_PEDO_READ_ATTEMPTS;
+       attempt++) {
+    if (ICM42670_ReadReg(config, ICM42670_REG_APEX_DATA0, apex_data, 4U) !=
+        ICM42670_OK) {
+      return ICM42670_ERROR;
+    }
 
-  if (ICM42670_ReadReg(config, ICM42670_REG_INT_STATUS3, &int_status3, 1U) !=
-      ICM42670_OK) {
-    return ICM42670_ERROR;
+    if (ICM42670_ReadReg(config, ICM42670_REG_INT_STATUS3, &int_status3, 1U) !=
+        ICM42670_OK) {
+      return ICM42670_ERROR;
+    }
+
+    if (IsInvalidPedoFrame(apex_data) == 0U) {
+      break;
+    }
+
+    if (attempt == (ICM42670_APEX_PEDO_READ_ATTEMPTS - 1U)) {
+      return ICM42670_BUSY;
+    }
   }
 
   pedo_data->step_count =
