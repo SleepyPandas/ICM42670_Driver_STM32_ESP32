@@ -1,0 +1,18 @@
+idf_component_register(
+    SRCS
+        "ICM42670_internal.c"
+        "ICM42670_driver.c"
+        "ICM42670_apex.c"
+        "ICM42670_fifo.c"
+        "ICM42670_fsync.c"
+        "ports/esp_idf/ICM42670_esp_idf.c"
+    INCLUDE_DIRS
+        "."
+        "ports/esp_idf"
+    REQUIRES
+        driver
+        esp_driver_gpio
+        esp_driver_i2c
+        esp_driver_spi
+        freertos
+)
