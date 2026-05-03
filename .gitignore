@@ -387,3 +387,14 @@ stlinkgdbserver_log.txt
 .github/
 .cursor/
 PersonalNotes.md
+
+# ESP-IDF component packaging files
+!ICM42670_Driver/CMakeLists.txt
+!ICM42670_Driver/examples/esp_idf/basic_i2c/CMakeLists.txt
+!ICM42670_Driver/examples/esp_idf/basic_i2c/main/CMakeLists.txt
+!ICM42670_Driver/examples/esp_idf/basic_spi/CMakeLists.txt
+!ICM42670_Driver/examples/esp_idf/basic_spi/main/CMakeLists.txt
+ICM42670_Driver/examples/esp_idf/*/build/
+ICM42670_Driver/examples/esp_idf/*/sdkconfig
+ICM42670_Driver/examples/esp_idf/*/sdkconfig.old
+ICM42670_Driver/examples/esp_idf/*/dependencies.lock
