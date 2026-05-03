@@ -16,16 +16,17 @@ After there should be more complex configurations if you need them for example: 
 
 ~~2.2 Configure ODR Output Data Rates~~ 
 
-    2.3 Configure LOW PASS FILTERS (Not MAJOR)
+~~2.3 Configure LOW PASS FILTERS (Not MAJOR)~~
 
-3. FIFO Buffer Configurations i.e With Apex and Without apex for 2.25 KByte FIFO buffer 1KB FIFO if Apex is active 
+~~3. FIFO Buffer Configurations i.e With Apex and Without apex for 2.25 KByte FIFO buffer 1KB FIFO if Apex is active~~ 
 
-    3.1 Expose Read from Register for Gyro/Accel and also read from FIFO buffer 
-4. Interrupt Routing for INT1 / INT2 in conjunction with Apex READY and DATA ready 
+~~3.1 Expose Read from Register for Gyro/Accel and also read from FIFO buffer~~ 
+~~4. Interrupt Routing for INT1 / INT2 in conjunction with Apex READY and DATA ready~~ 
 
 ~~5. Expose Apex functions in simple abstract layer~~  
 
-6. Expose a function to use FSYNC 
+~~6. Expose a function to use FSYNC~~ 
+
 
 
 
