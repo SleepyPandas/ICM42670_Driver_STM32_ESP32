@@ -1,0 +1,17 @@
+version: "0.1.0"
+description: "Portable ICM-42670-P IMU driver with a simple ESP-IDF I2C/SPI adapter."
+url: "https://github.com/SleepyPandas/ICM42670_Driver"
+repository: "https://github.com/SleepyPandas/ICM42670_Driver.git"
+license: "BSD-3-Clause"
+tags:
+  - imu
+  - sensor
+  - accelerometer
+  - gyroscope
+  - icm42670
+dependencies:
+  idf:
+    version: ">=5.0,<=6.0.1"
+files:
+  exclude:
+    - "ports/stm32_hal/**/*"
