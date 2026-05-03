@@ -392,12 +392,27 @@ stlinkgdbserver_log.txt
 PersonalNotes.md
 
 # ESP-IDF component packaging files
+!README.md
+!ICM42670_Driver/README.md
 !ICM42670_Driver/CMakeLists.txt
 !ICM42670_Driver/examples/esp_idf/basic_i2c/CMakeLists.txt
 !ICM42670_Driver/examples/esp_idf/basic_i2c/main/CMakeLists.txt
-!ICM42670_Driver/examples/esp_idf/basic_spi/CMakeLists.txt
-!ICM42670_Driver/examples/esp_idf/basic_spi/main/CMakeLists.txt
 ICM42670_Driver/examples/esp_idf/*/build/
 ICM42670_Driver/examples/esp_idf/*/sdkconfig
 ICM42670_Driver/examples/esp_idf/*/sdkconfig.old
 ICM42670_Driver/examples/esp_idf/*/dependencies.lock
+
+# Local STM32CubeIDE / STM32CubeMX hardware test project.
+# Kept in the working tree for board bring-up, but not published as part of
+# the platform-agnostic driver package.
+/Core/
+/Drivers/
+/cmake/
+/CMakeLists.txt
+/CMakePresets.json
+/ICM42670_Driver.ioc
+/STM32H503xx_FLASH.ld
+/STM32H503xx_RAM.ld
+/startup_stm32h503xx.s
+/newlib_lock_glue.c
+/stm32_lock.h
