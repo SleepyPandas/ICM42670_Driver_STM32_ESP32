@@ -1,35 +1,52 @@
-# ICM42670 Platform Agnostic Driver (Tested On STM32)
+# ICM42670 Portable Driver
 
-## Goal-> Provide a Very Simple API for ESP32, STM32, Arduino, Raspberrypi
-Should be able to call a couple of functions and simple pointers to get started to poll data accel, temp, gyro, and All APEX functions 
+Portable C driver for the TDK InvenSense ICM-42670-P IMU.
 
-After there should be more complex configurations if you need them for example: self-test registers, FIFO, Power Modes, Noise Filtering, calibration etc.
+The reusable driver lives in `ICM42670_Driver/`. It is designed around a small
+callback-based transport layer so the same core code can run on ESP32,
+STM32, Arduino-style environments, Linux userspace, or another embedded
+platform.
 
+## Repository Layout
 
-~~1. Enable abstract or function pointers for platform agnostic use~~ 
+```text
+ICM42670_Driver/
+  ICM42670_driver.*          Core accel, gyro, temperature, init API
+  ICM42670_apex.*            APEX feature helpers
+  ICM42670_fifo.*            FIFO helpers
+  ICM42670_fsync.*           FSYNC helpers
+  ICM42670_registermap.h     Register definitions
+  ports/
+    esp_idf/                 ESP-IDF I2C/SPI adapter
+    stm32_hal/               STM32 HAL I2C/SPI/I3C adapter
+  examples/
+    esp_idf/                 ESP-IDF example apps
+  CMakeLists.txt             ESP-IDF component build file
+  idf_component.yml          ESP Component Registry manifest
+```
 
-~~1.1 Expose I2C, SPI and Optionally I3C~~
+## Design
 
-~~2. Configure Power Modes~~ 
+- The core driver has no STM32 HAL or ESP-IDF dependency.
+- Platform-specific code lives in `ports/`.
+- Applications can either use a ready-made port adapter or provide their own
+  read/write callbacks.
+- Optional features are split into small modules so users can include only what
+  they need.
 
-~~2.1 Configure Full Scale Range for Gyro And Accel~~ 
+## ESP-IDF Component
 
-~~2.2 Configure ODR Output Data Rates~~ 
+The `ICM42670_Driver/` folder is the ESP-IDF component root. Its
+`idf_component.yml`, `CMakeLists.txt`, README, license, source files, and
+ESP-IDF adapter are the files intended for ESP Component Registry publishing.
 
-~~2.3 Configure LOW PASS FILTERS (Not MAJOR)~~
+See `ICM42670_Driver/README.md` for ESP-IDF quick-start examples.
 
-~~3. FIFO Buffer Configurations i.e With Apex and Without apex for 2.25 KByte FIFO buffer 1KB FIFO if Apex is active~~ 
+## STM32 Testing
 
-~~3.1 Expose Read from Register for Gyro/Accel and also read from FIFO buffer~~ 
-~~4. Interrupt Routing for INT1 / INT2 in conjunction with Apex READY and DATA ready~~ 
+This driver was brought up and tested with an STM32 project locally. CubeMX,
+linker, startup, and generated HAL files are useful for board validation, but
+they are intentionally excluded from the reusable driver package.
 
-~~5. Expose Apex functions in simple abstract layer~~  
-
-~~6. Expose a function to use FSYNC~~ 
-
-
-
-
-
-[DataSheet STM32](https://www.st.com/resource/en/user_manual/um3121-stm32h5-nucleo64-board-mb1814-stmicroelectronics.pdf)
+## Sensor Datasheet
 [DataSheet ICM42670](https://d17t6iyxenbwp1.cloudfront.net/s3fs-public/2026-02/ds-000451_icm-42670-p-datasheet_0.pdf?VersionId=IZnZlzqvpHU7XfSMavsmHv4yFZkfwwyd)
