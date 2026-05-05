@@ -1,9 +1,6 @@
 /**
  * @file ICM42670_stm32_hal.c
- * @brief STM32 HAL SPI transport adapter for the ICM-42670-P driver.
- * This file implements the SPI/I2C read and write functions for the ICM-42670-P
- * driver, the goal is to provide a simple adapter layer that can be
- * used with the ICM-42670 driver on STM32(s) using the HAL library.
+ * @brief STM32 HAL SPI, I2C, and I3C transport adapters.
  */
 
 #include "ICM42670_stm32_hal.h"
@@ -312,4 +309,3 @@ int8_t ICM42670_STM32_I2C_WriteReg(void *handle, uint8_t reg_addr,
   return (status == HAL_OK) ? ICM42670_OK : ICM42670_ERROR;
 }
 #endif /* HAL_I2C_MODULE_ENABLED */
-
