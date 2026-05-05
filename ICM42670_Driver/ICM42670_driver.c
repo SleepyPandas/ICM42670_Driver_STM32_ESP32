@@ -1,9 +1,6 @@
 /**
- *
  * @file        ICM42670_driver.c
- * @brief
- *               This file will contain the main logic for using the ICM42670
- * chip
+ * @brief Core ICM-42670-P initialization, configuration, and read functions.
  * @author Anthony / SleepPandas
  */
 
@@ -402,14 +399,6 @@ ICM42670_Status_t ICM42670_ReadTempC(const ICM42670_Config *config,
   return ICM42670_OK;
 }
 
-/**
- * @brief Perform calibration of the ICM42670 IMU. Does not write to Cal
- * registers, but instead calculates and returns bias values for accel and gyro.
- * @note This is a simple calibration routine that assumes the device is
- * stationary and level during calibration.
- * @param config Pointer to the ICM42670 configuration structure.
- * @return Status of the calibration operation.
- */
 ICM42670_Status_t ICM42670_Gyro_Calibration(ICM42670_Config *config) {
   int32_t gyro_bias[3] = {0};
   int16_t gyro_raw[3] = {0};
