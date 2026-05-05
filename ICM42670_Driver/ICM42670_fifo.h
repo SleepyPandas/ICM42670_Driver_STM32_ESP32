@@ -27,33 +27,33 @@ extern "C" {
  * @brief ICM-42670-P interrupt output pins.
  */
 typedef enum {
-  ICM42670_INT_PIN1 = 0U,
-  ICM42670_INT_PIN2 = 1U,
+  ICM42670_INT_PIN1 = 0U, /**< INT1 output pin. */
+  ICM42670_INT_PIN2 = 1U, /**< INT2 output pin. */
 } ICM42670_IntPin_t;
 
 /**
  * @brief FIFO interrupt sources that can be routed to INT1 or INT2.
  */
 typedef enum {
-  ICM42670_FIFO_INT_NONE = 0x00U,
-  ICM42670_FIFO_INT_THRESHOLD = 0x04U,
-  ICM42670_FIFO_INT_FULL = 0x02U,
+  ICM42670_FIFO_INT_NONE = 0x00U, /**< Clear FIFO interrupt routing. */
+  ICM42670_FIFO_INT_THRESHOLD = 0x04U, /**< FIFO watermark interrupt. */
+  ICM42670_FIFO_INT_FULL = 0x02U, /**< FIFO full interrupt. */
   ICM42670_FIFO_INT_THRESHOLD_AND_FULL =
-      (ICM42670_FIFO_INT_THRESHOLD | ICM42670_FIFO_INT_FULL),
+      (ICM42670_FIFO_INT_THRESHOLD | ICM42670_FIFO_INT_FULL), /**< Both FIFO sources. */
 } ICM42670_FifoIntSource_t;
 
 /**
  * @brief Parsed FIFO packet using the default 16-bit FIFO format.
  */
 typedef struct {
-  uint8_t header;
-  uint8_t has_accel;
-  uint8_t has_gyro;
-  uint8_t has_timestamp;
-  int16_t accel_raw[3];
-  int16_t gyro_raw[3];
-  int8_t temp_raw;
-  uint16_t timestamp;
+  uint8_t header; /**< Raw FIFO packet header byte. */
+  uint8_t has_accel; /**< Nonzero when accel_raw contains valid data. */
+  uint8_t has_gyro; /**< Nonzero when gyro_raw contains valid data. */
+  uint8_t has_timestamp; /**< Nonzero when timestamp contains valid data. */
+  int16_t accel_raw[3]; /**< Raw X, Y, Z accelerometer counts. */
+  int16_t gyro_raw[3]; /**< Raw X, Y, Z gyroscope counts. */
+  int8_t temp_raw; /**< Raw FIFO temperature byte. */
+  uint16_t timestamp; /**< Raw FIFO timestamp value. */
 } ICM42670_FifoPacket_t;
 
 /**

@@ -1,8 +1,6 @@
 /**
- *
  * @file        ICM42670_apex.c
- * @brief ICM-42670-P APEX feature functions.
- *
+ * @brief ICM-42670-P APEX motion feature functions.
  * @author Anthony / SleepPandas
  */
 
