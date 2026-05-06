@@ -40,7 +40,10 @@ The `ICM42670_Driver/` folder is the ESP-IDF component root. Its
 `idf_component.yml`, `CMakeLists.txt`, README, license, source files, and
 ESP-IDF adapter are the files intended for ESP Component Registry publishing.
 
-See `ICM42670_Driver/README.md` for ESP-IDF quick-start examples.
+See `ICM42670_Driver/README.md` for ESP-IDF quick-start examples. 
+
+Or see on the [ESP Registry.](https://components.espressif.com/components/sleepypandas/icm42670_driver/versions/0.1.0/readme)
+
 
 ## STM32 Testing
 
