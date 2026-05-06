@@ -384,10 +384,15 @@ __marimo__/
 
 #Other
 *.txt
+!docs/theme/doxygen-awesome-LICENSE.txt
 .txt
 gdbClient_log.txt
 stlinkgdbserver_log.txt
-.github/
+# Keep local GitHub metadata ignored unless a workflow is intentionally added.
+.github/*
+!.github/workflows/
+.github/workflows/*
+!.github/workflows/docs.yml
 .cursor/
 PersonalNotes.md
 
