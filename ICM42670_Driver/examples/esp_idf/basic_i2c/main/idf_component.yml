@@ -1,0 +1,3 @@
+dependencies:
+  ICM42670_Driver:
+    path: "../../../.."
