@@ -1,0 +1,86 @@
+# Run `doxygen` from the repository root.
+# Output: docs/doxygen/html/
+# Theme: doxygen-awesome-css v2.4.2 (https://github.com/jothepro/doxygen-awesome-css)
+# Keep HTML_COLORSTYLE=LIGHT and FULL_SIDEBAR=NO for the imported theme.
+
+PROJECT_NAME           = "ICM42670 Portable Driver"
+PROJECT_BRIEF          = "Public API reference for the ICM-42670-P IMU driver"
+OUTPUT_DIRECTORY       = docs/doxygen
+HTML_OUTPUT            = html
+CREATE_SUBDIRS         = NO
+OUTPUT_LANGUAGE        = English
+OPTIMIZE_OUTPUT_FOR_C  = YES
+
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = NO
+EXTRACT_LOCAL_CLASSES  = NO
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = YES
+HIDE_FRIEND_COMPOUNDS  = YES
+HIDE_IN_BODY_DOCS      = YES
+
+INPUT                  = docs/quick-start.md \
+                         docs/index.md \
+                         README.md \
+                         ICM42670_Driver
+FILE_PATTERNS          = *.h *.c *.md
+RECURSIVE              = YES
+EXCLUDE                = build \
+                         Core \
+                         Drivers \
+                         cmake \
+                         examples \
+                         .playwright-mcp \
+                         ICM42670_Driver/build \
+                         ICM42670_Driver/dist \
+                         ICM42670_Driver/examples \
+                         docs/doxygen
+EXCLUDE_SYMLINKS       = NO
+EXCLUDE_PATTERNS       = */build/* \
+                         */Core/* \
+                         */Drivers/* \
+                         */cmake/* \
+                         */examples/* \
+                         */dist/* \
+                         */__pycache__/* \
+                         */docs/doxygen/*
+
+USE_MDFILE_AS_MAINPAGE = docs/quick-start.md
+MARKDOWN_SUPPORT       = YES
+AUTOLINK_SUPPORT       = YES
+
+SOURCE_BROWSER         = NO
+INLINE_SOURCES         = NO
+REFERENCED_BY_RELATION = YES
+REFERENCES_RELATION    = YES
+
+GENERATE_HTML          = YES
+HTML_FILE_EXTENSION    = .html
+HTML_HEADER            = docs/theme/header.html
+HTML_COLORSTYLE        = LIGHT
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = NO
+HTML_COPY_CLIPBOARD    = NO
+HTML_EXTRA_STYLESHEET  = docs/theme/doxygen-awesome.css \
+                         docs/theme/doxygen-awesome-sidebar-only.css \
+                         docs/theme/doxygen-awesome-sidebar-only-darkmode-toggle.css \
+                         docs/theme/github-colors.css
+HTML_EXTRA_FILES       = docs/theme/doxygen-awesome-darkmode-toggle.js \
+                         docs/theme/doxygen-awesome-fragment-copy-button.js \
+                         docs/theme/doxygen-scroll-jump.js
+LAYOUT_FILE            = DoxygenLayout.xml
+SEARCHENGINE           = YES
+
+GENERATE_LATEX         = NO
+GENERATE_RTF           = NO
+GENERATE_MAN           = NO
+GENERATE_XML           = NO
+GENERATE_DOCBOOK       = NO
+
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = NO
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = NO
+QUIET                  = NO
