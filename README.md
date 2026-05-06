@@ -14,7 +14,7 @@ another embedded platform.
 
 ## Documentation
 
-[Documentation](https://sleepypandas.github.io/ICM42670_Driver/)
+[Documentation](https://sleepypandas.github.io/ICM42670_Driver_STM32_ESP32/)
 
 ---
 
