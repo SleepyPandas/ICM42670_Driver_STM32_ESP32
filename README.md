@@ -1,9 +1,8 @@
-![Language](https://img.shields.io/badge/Language-C-white)
-![Architecture](https://img.shields.io/badge/Architecture-Portable_Callback_Core-blue)
-![Platforms](https://img.shields.io/badge/Platforms-ESP--IDF%20%7C%20STM32%20HAL-42f5da)
-![Sensor](https://img.shields.io/badge/IMU-ICM--42670--P-a442f5)
-![Interfaces](https://img.shields.io/badge/I%2FO-I2C%20%7C%20SPI%20%7C%20I3C-f7b80a)
-![Docs](https://img.shields.io/badge/Docs-Doxygen-e81526)
+<a href="https://product.tdk.com/system/files/dam/doc/product/sensor/mortion-inertial/imu/data_sheet/ds-000451-icm-42670-p.pdf"><img src="https://img.shields.io/badge/Datasheet-ICM--42670--P-0078D4?style=flat-round&logo=bookstack&logoColor=white" alt="Datasheet"/></a> 
+![C](https://img.shields.io/badge/C-00599C?style=flat&logo=c&logoColor=white) 
+![STM32](https://img.shields.io/badge/STM32-03234B?style=flat&logo=stmicroelectronics&logoColor=white) 
+![ESP32](https://img.shields.io/badge/ESP32-E7352C?style=flat&logo=espressif&logoColor=white) 
+![I/O](https://img.shields.io/badge/I%2FO-I3C_%7C_I2C_%7C_SPI-f7b80a)
 
 # ICM42670 Portable Driver
 
