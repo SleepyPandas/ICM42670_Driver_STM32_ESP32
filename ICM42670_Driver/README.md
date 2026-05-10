@@ -6,7 +6,7 @@ I2C and SPI.
 ## Add To An ESP-IDF Project
 
 ```sh
-idf.py add-dependency "sleepypandas/icm42670_driver^0.1.2"
+idf.py add-dependency "sleepypandas/icm42670_driver^1.0.0"
 idf.py reconfigure
 ```
 
@@ -36,7 +36,7 @@ void app_main(void) {
   ICM42670_ESP_I2CBus bus = {0};
 
   esp_err_t err = ICM42670_ESP_I2C_Init(&imu, &bus, I2C_NUM_0, GPIO_NUM_21,
-                                        GPIO_NUM_22, 0x68, 400000);
+                                        GPIO_NUM_22, 0x68, 100000);
   if (err == ESP_ERR_INVALID_STATE) {
     ESP_LOGE(TAG,
              "I2C init failed: port or GPIO pins are already in use. Deinit "
@@ -68,7 +68,7 @@ void app_main(void) {
              accel.x_g, accel.y_g, accel.z_g, gyro.x_dps, gyro.y_dps,
              gyro.z_dps, temp_c);
 
-    vTaskDelay(pdMS_TO_TICKS(500));
+    vTaskDelay(pdMS_TO_TICKS(100));
   }
 }
 ```
@@ -92,4 +92,3 @@ calibration, and APEX pedometer polling.
 
 The ESP adapter only fills the portable driver's transport callbacks. The normal
 driver APIs remain the same for accel, gyro, temperature, and APEX.
-
