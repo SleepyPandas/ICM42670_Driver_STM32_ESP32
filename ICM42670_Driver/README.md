@@ -5,20 +5,6 @@ I2C and SPI.
 
 ## Add To An ESP-IDF Project
 
-After the component is published, add it from the ESP Component Registry:
-
-```sh
-idf.py add-dependency "sleepypandas/icm42670_driver^0.1.2"
-```
-
-For local testing before publishing, add this repository folder as an extra
-component directory or use one of the included examples:
-
-- `examples/esp_idf/basic_i2c`
-
-If an older `0.1.0` or `0.1.1` release was already downloaded, update the
-dependency to a new published version and reconfigure the project:
-
 ```sh
 idf.py add-dependency "sleepypandas/icm42670_driver^0.1.2"
 idf.py reconfigure
@@ -107,30 +93,3 @@ calibration, and APEX pedometer polling.
 The ESP adapter only fills the portable driver's transport callbacks. The normal
 driver APIs remain the same for accel, gyro, temperature, and APEX.
 
-## Release 0.1.2
-
-Run these commands from this component directory in the ESP-IDF PowerShell
-environment:
-
-```powershell
-cd C:\Users\AnthonyPC\Documents\GitHub\ICM42670_Driver\ICM42670_Driver
-rg -n "version:|sleepypandas/icm42670_driver" README.md idf_component.yml
-git diff --check
-compote version
-compote registry login --default-namespace sleepypandas
-compote component upload --namespace sleepypandas --name icm42670_driver --dry-run
-git status --short
-git add README.md idf_component.yml examples/esp_idf/basic_i2c/CMakeLists.txt examples/esp_idf/basic_i2c/main/CMakeLists.txt examples/esp_idf/basic_i2c/main/main.c examples/esp_idf/basic_i2c/main/idf_component.yml
-git commit -m "Release ESP-IDF component 0.1.2"
-git tag v0.1.2
-git push origin HEAD
-git push origin v0.1.2
-compote component upload --namespace sleepypandas --name icm42670_driver
-```
-
-After the upload finishes, verify the consumer command:
-
-```powershell
-idf.py add-dependency "sleepypandas/icm42670_driver^0.1.2"
-idf.py reconfigure
-```
